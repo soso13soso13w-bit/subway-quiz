@@ -1,1903 +1,1084 @@
 <!DOCTYPE html>
-<html lang="ko" class="h-full bg-slate-50">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>써브웨이 알바 레시피 마스터 퀴즈</title>
-    <!-- Tailwind CSS -->
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Noto Sans KR) -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
                         subway: {
-                            green: '#008938',
-                            darkgreen: '#006227',
-                            yellow: '#FFC72C',
-                            darkyellow: '#e5af1d',
-                            lightgreen: '#e6f4ec',
-                            lightyellow: '#fff9e6',
+                            green: '#009245',
+                            darkgreen: '#007034',
+                            yellow: '#FFC20E',
+                            lightyellow: '#FFF8D6',
+                            lightbg: '#F4F7F5',
+                            darkbg: '#121816',
+                            carddark: '#1E2623'
                         }
+                    },
+                    fontFamily: {
+                        sans: ['Noto Sans KR', 'sans-serif']
                     }
                 }
             }
         }
     </script>
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Google Fonts Inter & Noto Sans KR -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: 'Noto Sans KR', sans-serif;
+            touch-action: manipulation;
             -webkit-tap-highlight-color: transparent;
         }
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
         }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: #f1f5f9;
-            border-radius: 4px;
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
         }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
+        .veggie-badge {
+            transition: all 0.2s ease;
         }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
+        .veggie-badge:active {
+            transform: scale(0.95);
         }
         @keyframes pulse-subtle {
             0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.02); }
+            50% { transform: scale(1.03); }
         }
-        .animate-pulse-subtle {
+        .pulse-subtle {
             animation: pulse-subtle 2s infinite ease-in-out;
         }
     </style>
 </head>
-<body class="h-full text-slate-800 flex flex-col antialiased selection:bg-subway-yellow selection:text-slate-900">
+<body class="bg-subway-lightbg text-slate-800 min-h-screen flex flex-col antialiased selection:bg-subway-yellow selection:text-black">
 
-    <!-- Header Navigation -->
-    <header class="bg-subway-green text-white sticky top-0 z-40 shadow-md">
-        <div class="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
-            <div class="flex items-center space-x-3 cursor-pointer" onclick="app.showPage('dashboard')">
-                <div class="bg-subway-yellow text-subway-green font-black px-2.5 py-1 rounded-lg text-xl tracking-tighter italic border border-white/20 shadow-sm">
+    <!-- Top Navigation Header -->
+    <header class="bg-subway-green text-white shadow-md sticky top-0 z-40">
+        <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-2 cursor-pointer" onclick="showView('dashboard')">
+                <div class="bg-subway-yellow text-subway-darkgreen font-black text-xl px-2.5 py-0.5 rounded-md tracking-tighter transform -skew-x-6 shadow-sm">
                     SUBWAY
                 </div>
-                <div>
-                    <h1 class="font-extrabold text-base md:text-lg leading-tight flex items-center gap-1.5">
-                        레시피 마스터
-                        <span class="bg-subway-yellow text-slate-900 text-[10px] font-extrabold px-1.5 py-0.5 rounded-full uppercase tracking-wider">PRO</span>
-                    </h1>
-                    <p class="text-[11px] text-white/80 hidden sm:block">신입 미소지기·알바생을 위한 21종 마스터 레시피</p>
-                </div>
+                <span class="font-extrabold text-lg tracking-tight hidden sm:inline">레시피 마스터</span>
             </div>
-            <nav class="flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm font-semibold">
-                <button onclick="app.showPage('dashboard')" id="nav-dashboard" class="px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition flex items-center gap-1.5">
-                    <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
-                    <span>홈</span>
+            
+            <nav class="flex items-center space-x-1 sm:space-x-3 text-xs sm:text-sm font-bold">
+                <button onclick="showView('dashboard')" id="nav-dashboard" class="px-2.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 transition flex items-center space-x-1">
+                    <i class="fa-solid fa-house"></i>
+                    <span class="hidden md:inline">대시보드</span>
                 </button>
-                <button onclick="app.showPage('recipes')" id="nav-recipes" class="px-3 py-2 rounded-lg hover:bg-white/10 transition flex items-center gap-1.5">
-                    <i data-lucide="book-open" class="w-4 h-4"></i>
-                    <span>21종 도감</span>
+                <button onclick="showView('guide')" id="nav-guide" class="px-2.5 py-1.5 rounded-lg hover:bg-white/10 transition flex items-center space-x-1">
+                    <i class="fa-solid fa-book-open"></i>
+                    <span>레시피 도감</span>
                 </button>
-                <button onclick="app.showPage('wrong-notes')" id="nav-wrong-notes" class="px-3 py-2 rounded-lg hover:bg-white/10 transition flex items-center gap-1.5 relative">
-                    <i data-lucide="notebook-pen" class="w-4 h-4"></i>
+                <button onclick="showView('notes')" id="nav-notes" class="px-2.5 py-1.5 rounded-lg hover:bg-white/10 transition flex items-center space-x-1 relative">
+                    <i class="fa-solid fa-bookmark"></i>
                     <span>오답노트</span>
-                    <span id="wrong-count-badge" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-between justify-center font-bold">0</span>
+                    <span id="nav-note-count" class="bg-subway-yellow text-black text-[10px] font-black px-1.5 py-0.2 rounded-full hidden">0</span>
                 </button>
             </nav>
         </div>
     </header>
 
     <!-- Main Container -->
-    <main class="flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 md:p-8">
+    <main class="flex-grow max-w-4xl w-full mx-auto p-4 sm:p-6">
 
-        <!-- ================= PAGE 1: DASHBOARD ================= -->
-        <section id="page-dashboard" class="space-y-6">
-            <!-- Hero banner -->
-            <div class="bg-gradient-to-r from-subway-green to-subway-darkgreen rounded-2xl p-6 md:p-8 text-white shadow-lg relative overflow-hidden">
-                <div class="absolute -right-8 -bottom-8 opacity-10 text-white pointer-events-none">
-                    <i data-lucide="utensils" class="w-64 h-64"></i>
-                </div>
-                <div class="relative z-10 space-y-3 max-w-2xl">
-                    <div class="inline-flex items-center gap-1.5 bg-subway-yellow text-slate-900 font-bold text-xs px-3 py-1 rounded-full shadow-sm">
-                        <i data-lucide="zap" class="w-3.5 h-3.5 text-slate-900 fill-current"></i>
-                        실전 매장 적응 암기 솔루션
+        <!-- ================= VIEW 1: DASHBOARD ================= -->
+        <section id="view-dashboard" class="space-y-6">
+            <!-- Banner / Veggie Strip -->
+            <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+                    <div>
+                        <div class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-green-100 text-subway-darkgreen mb-2">
+                            <i class="fa-solid fa-check-circle mr-1"></i> 공식 8단계 야채 빌드 순서
+                        </div>
+                        <h1 class="text-xl sm:text-2xl font-black tracking-tight text-slate-900">
+                            신입 알바생 전용 <span class="text-subway-green">초속성 암기 트레이너</span>
+                        </h1>
                     </div>
-                    <h2 class="text-2xl sm:text-3xl font-black leading-tight">
-                        주문 들어오면 손이 먼저 움직이도록!<br class="hidden sm:inline"> 써브웨이 21종 레시피 완전 정복
+                    <button onclick="startQuickQuiz()" class="bg-subway-yellow hover:bg-yellow-400 text-slate-900 font-extrabold px-6 py-3 rounded-xl shadow-md transition transform active:scale-95 flex items-center justify-center space-x-2 text-base">
+                        <i class="fa-solid fa-bolt text-lg"></i>
+                        <span>바로 퀴즈 시작 (10문항)</span>
+                    </button>
+                </div>
+
+                <!-- Veggie Flow Visualizer -->
+                <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+                    <div class="text-xs font-bold text-slate-500 mb-2 flex justify-between items-center">
+                        <span>🥗 야채 토핑 기본 배치 순서 (암기 필수!)</span>
+                        <span class="text-[11px] text-subway-green font-semibold">100% 준수</span>
+                    </div>
+                    <div class="grid grid-cols-4 sm:grid-cols-8 gap-1.5 text-center text-xs font-bold">
+                        <div class="bg-emerald-100 text-emerald-800 py-1.5 rounded-lg border border-emerald-200 shadow-2xs">1. 양상추</div>
+                        <div class="bg-emerald-100 text-emerald-800 py-1.5 rounded-lg border border-emerald-200 shadow-2xs">2. 토마토</div>
+                        <div class="bg-emerald-100 text-emerald-800 py-1.5 rounded-lg border border-emerald-200 shadow-2xs">3. 오이</div>
+                        <div class="bg-emerald-100 text-emerald-800 py-1.5 rounded-lg border border-emerald-200 shadow-2xs">4. 피클</div>
+                        <div class="bg-emerald-100 text-emerald-800 py-1.5 rounded-lg border border-emerald-200 shadow-2xs">5. 피망</div>
+                        <div class="bg-emerald-100 text-emerald-800 py-1.5 rounded-lg border border-emerald-200 shadow-2xs">6. 양파</div>
+                        <div class="bg-emerald-100 text-emerald-800 py-1.5 rounded-lg border border-emerald-200 shadow-2xs">7. 올리브</div>
+                        <div class="bg-emerald-100 text-emerald-800 py-1.5 rounded-lg border border-emerald-200 shadow-2xs">8. 할라피뇨</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Learning Dashboard Stats Grid -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-between">
+                    <span class="text-xs font-bold text-slate-400">총 도전 퀴즈</span>
+                    <div class="flex items-baseline space-x-1 mt-2">
+                        <span id="stat-total-solved" class="text-2xl font-black text-slate-800">0</span>
+                        <span class="text-xs font-medium text-slate-400">문제</span>
+                    </div>
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-between">
+                    <span class="text-xs font-bold text-slate-400">평균 정답률</span>
+                    <div class="flex items-baseline space-x-1 mt-2">
+                        <span id="stat-accuracy" class="text-2xl font-black text-subway-green">0%</span>
+                    </div>
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-between">
+                    <span class="text-xs font-bold text-slate-400">취약 메뉴</span>
+                    <div id="stat-weak-menu" class="text-sm font-extrabold text-amber-600 truncate mt-2">없음</div>
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-between">
+                    <span class="text-xs font-bold text-slate-400">오답노트 보관</span>
+                    <div class="flex items-baseline space-x-1 mt-2">
+                        <span id="stat-notes-count" class="text-2xl font-black text-rose-500">0</span>
+                        <span class="text-xs font-medium text-slate-400">건</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quiz Setup Panel -->
+            <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 space-y-5">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <h2 class="text-lg font-black text-slate-900 flex items-center">
+                        <i class="fa-solid fa-sliders text-subway-green mr-2"></i> Custom Quiz Setting (맞춤 학습)
                     </h2>
-                    <p class="text-xs sm:text-sm text-emerald-100 leading-relaxed">
-                        메인 재료 수량, 썹픽 소스 조합, 야채 8종 순서(양-토-오-피-피-양-올-할)까지 무한 반복 실전 훈련을 시작하세요.
-                    </p>
-                    <div class="pt-2 flex flex-wrap gap-3">
-                        <button onclick="app.openQuizModal()" class="bg-subway-yellow hover:bg-subway-darkyellow text-slate-900 font-extrabold px-6 py-3 rounded-xl shadow-md transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-2 text-sm sm:text-base">
-                            <i data-lucide="play-circle" class="w-5 h-5 fill-slate-900 text-subway-yellow"></i>
-                            맞춤 퀴즈 설정 후 시작
-                        </button>
-                        <button onclick="app.startQuickQuiz()" class="bg-white/15 hover:bg-white/25 text-white font-bold px-5 py-3 rounded-xl backdrop-blur-sm transition text-sm flex items-center gap-2 border border-white/20">
-                            <i data-lucide="sparkles" class="w-4 h-4 text-subway-yellow"></i>
-                            바로 시작 (기본 10문항)
-                        </button>
-                    </div>
+                    <span class="text-xs font-medium text-slate-400">원하는 조건으로 출제</span>
                 </div>
-            </div>
 
-            <!-- Stats Overview Cards -->
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
-                    <div class="flex items-center justify-between text-slate-500 mb-2">
-                        <span class="text-xs font-bold uppercase tracking-wider">누적 풀이</span>
-                        <div class="p-2 bg-emerald-50 text-subway-green rounded-lg"><i data-lucide="check-circle-2" class="w-4 h-4"></i></div>
-                    </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-bold">
+                    <!-- Range / Theme -->
                     <div>
-                        <div id="stat-total-solved" class="text-2xl font-black text-slate-800">0개</div>
-                        <p id="stat-accuracy" class="text-xs text-slate-500 font-medium mt-1">정답률 0%</p>
+                        <label class="block text-slate-500 mb-1.5">학습 영역</label>
+                        <select id="setting-range" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-subway-green">
+                            <option value="all">전체 영역 (메인 재료 + 썹픽 + 야채 순서)</option>
+                            <option value="main">1. 메인 속재료 & 수량 암기</option>
+                            <option value="subpick">2. 썹픽 (빵/치즈/소스) 고정 조합</option>
+                            <option value="veggie">3. 야채 8종 빌드 순서 훈련</option>
+                        </select>
                     </div>
-                </div>
 
-                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
-                    <div class="flex items-center justify-between text-slate-500 mb-2">
-                        <span class="text-xs font-bold uppercase tracking-wider">평균 응답 속도</span>
-                        <div class="p-2 bg-amber-50 text-amber-600 rounded-lg"><i data-lucide="timer" class="w-4 h-4"></i></div>
-                    </div>
+                    <!-- Question Count -->
                     <div>
-                        <div id="stat-avg-speed" class="text-2xl font-black text-slate-800">0.0초</div>
-                        <p class="text-xs text-slate-500 font-medium mt-1">문제당 소요 시간</p>
+                        <label class="block text-slate-500 mb-1.5">문제 수</label>
+                        <div class="grid grid-cols-4 gap-2">
+                            <button type="button" onclick="setCount(10)" class="btn-count py-2.5 rounded-xl border border-slate-200 font-bold bg-subway-green text-white" data-count="10">10개</button>
+                            <button type="button" onclick="setCount(20)" class="btn-count py-2.5 rounded-xl border border-slate-200 font-bold bg-slate-50 text-slate-700" data-count="20">20개</button>
+                            <button type="button" onclick="setCount(30)" class="btn-count py-2.5 rounded-xl border border-slate-200 font-bold bg-slate-50 text-slate-700" data-count="30">30개</button>
+                            <button type="button" onclick="setCount(999)" class="btn-count py-2.5 rounded-xl border border-slate-200 font-bold bg-slate-50 text-slate-700" data-count="999">전체</button>
+                        </div>
                     </div>
-                </div>
 
-                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
-                    <div class="flex items-center justify-between text-slate-500 mb-2">
-                        <span class="text-xs font-bold uppercase tracking-wider">오답 노트</span>
-                        <div class="p-2 bg-rose-50 text-rose-600 rounded-lg"><i data-lucide="alert-circle" class="w-4 h-4"></i></div>
-                    </div>
+                    <!-- Question Type -->
                     <div>
-                        <div id="stat-wrong-count" class="text-2xl font-black text-slate-800">0개</div>
-                        <button onclick="app.showPage('wrong-notes')" class="text-xs text-subway-green hover:underline font-bold mt-1 inline-flex items-center gap-0.5">
-                            복습하기 <i data-lucide="arrow-right" class="w-3 h-3"></i>
-                        </button>
+                        <label class="block text-slate-500 mb-1.5">문제 유형</label>
+                        <select id="setting-type" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-subway-green">
+                            <option value="all">전체 무작위 혼합 출제</option>
+                            <option value="mc">객관식 (4지 선다)</option>
+                            <option value="short">주관식 단답 / 빈칸 채우기</option>
+                            <option value="ox">OX 퀴즈</option>
+                            <option value="veggie_order">야채 순서 배열 전용</option>
+                            <option value="order_roleplay">실전 고객 주문 상황 퀴즈</option>
+                        </select>
                     </div>
-                </div>
 
-                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
-                    <div class="flex items-center justify-between text-slate-500 mb-2">
-                        <span class="text-xs font-bold uppercase tracking-wider">취약 메뉴</span>
-                        <div class="p-2 bg-indigo-50 text-indigo-600 rounded-lg"><i data-lucide="trending-down" class="w-4 h-4"></i></div>
-                    </div>
+                    <!-- Difficulty -->
                     <div>
-                        <div id="stat-weakest-menu" class="text-lg font-bold text-slate-800 truncate">데이터 수집 중</div>
-                        <p class="text-xs text-slate-500 font-medium mt-1">정답률이 낮은 메뉴</p>
+                        <label class="block text-slate-500 mb-1.5">난이도 설정</label>
+                        <select id="setting-diff" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-subway-green">
+                            <option value="beginner">초급 (기본 객관식 위주)</option>
+                            <option value="intermediate" selected>중급 (빈칸/썹픽/수량 혼합)</option>
+                            <option value="advanced">고급 (주관식/실전주문/야채순서)</option>
+                        </select>
                     </div>
                 </div>
-            </div>
 
-            <!-- Learning Quick Category Cards -->
-            <div class="space-y-3">
-                <div class="flex items-center justify-between">
-                    <h3 class="font-extrabold text-slate-800 text-lg flex items-center gap-2">
-                        <i data-lucide="compass" class="w-5 h-5 text-subway-green"></i>
-                        테마별 집중 학습
-                    </h3>
-                    <span class="text-xs text-slate-500">원하는 파트만 집약 학습</span>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <!-- Main Ingredients Card -->
-                    <div onclick="app.startCategoryQuiz('main')" class="bg-white p-5 rounded-xl border border-slate-200 hover:border-subway-green shadow-sm hover:shadow-md transition cursor-pointer group flex flex-col justify-between">
-                        <div class="flex items-start justify-between">
-                            <div class="p-3 bg-subway-lightgreen text-subway-green rounded-xl group-hover:scale-110 transition-transform">
-                                <i data-lucide="sandwich" class="w-6 h-6"></i>
-                            </div>
-                            <span class="text-xs bg-slate-100 text-slate-600 font-bold px-2 py-1 rounded">21종 메인</span>
-                        </div>
-                        <div class="mt-4">
-                            <h4 class="font-bold text-slate-800 group-hover:text-subway-green transition">메인 재료 & 수량 암기</h4>
-                            <p class="text-xs text-slate-500 mt-1 leading-relaxed">
-                                비엠티, 베이컨, 쉬림프 등 정확한 조각/스쿱 수량 학습
-                            </p>
-                        </div>
-                        <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-subway-green">
-                            <span>시작하기</span>
-                            <i data-lucide="chevron-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
-                        </div>
-                    </div>
-
-                    <!-- Vegetable Order Card -->
-                    <div onclick="app.startCategoryQuiz('veg')" class="bg-white p-5 rounded-xl border border-slate-200 hover:border-subway-green shadow-sm hover:shadow-md transition cursor-pointer group flex flex-col justify-between">
-                        <div class="flex items-start justify-between">
-                            <div class="p-3 bg-emerald-50 text-emerald-600 rounded-xl group-hover:scale-110 transition-transform">
-                                <i data-lucide="salad" class="w-6 h-6"></i>
-                            </div>
-                            <span class="text-xs bg-emerald-100 text-emerald-800 font-bold px-2 py-1 rounded">공식 8종</span>
-                        </div>
-                        <div class="mt-4">
-                            <h4 class="font-bold text-slate-800 group-hover:text-subway-green transition">야채 공식 순서 훈련</h4>
-                            <p class="text-xs text-slate-500 mt-1 leading-relaxed">
-                                양상추 → 토마토 → 오이 → 피클 → 피망 → 양파 → 올리브 → 할라피뇨
-                            </p>
-                        </div>
-                        <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-emerald-600">
-                            <span>순서 맞히기 시작</span>
-                            <i data-lucide="chevron-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
-                        </div>
-                    </div>
-
-                    <!-- Bread/Cheese/Sauce Card -->
-                    <div onclick="app.startCategoryQuiz('sauce')" class="bg-white p-5 rounded-xl border border-slate-200 hover:border-subway-green shadow-sm hover:shadow-md transition cursor-pointer group flex flex-col justify-between">
-                        <div class="flex items-start justify-between">
-                            <div class="p-3 bg-subway-lightyellow text-amber-700 rounded-xl group-hover:scale-110 transition-transform">
-                                <i data-lucide="flame" class="w-6 h-6"></i>
-                            </div>
-                            <span class="text-xs bg-amber-100 text-amber-800 font-bold px-2 py-1 rounded">썹픽 & 소스</span>
-                        </div>
-                        <div class="mt-4">
-                            <h4 class="font-bold text-slate-800 group-hover:text-subway-green transition">빵 · 치즈 · 썹픽 소스</h4>
-                            <p class="text-xs text-slate-500 mt-1 leading-relaxed">
-                                메뉴별 권장 빵, 치즈 및 공식 썹픽(SubPick) 소스 조합
-                            </p>
-                        </div>
-                        <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-amber-600">
-                            <span>시작하기</span>
-                            <i data-lucide="chevron-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
-                        </div>
-                    </div>
-
-                    <!-- Speed Quiz Card -->
-                    <div onclick="app.startCategoryQuiz('speed')" class="bg-white p-5 rounded-xl border border-slate-200 hover:border-subway-green shadow-sm hover:shadow-md transition cursor-pointer group flex flex-col justify-between">
-                        <div class="flex items-start justify-between">
-                            <div class="p-3 bg-rose-50 text-rose-600 rounded-xl group-hover:scale-110 transition-transform">
-                                <i data-lucide="timer-reset" class="w-6 h-6"></i>
-                            </div>
-                            <span class="text-xs bg-rose-100 text-rose-800 font-bold px-2 py-1 rounded">스피드 챌린지</span>
-                        </div>
-                        <div class="mt-4">
-                            <h4 class="font-bold text-slate-800 group-hover:text-subway-green transition">타임어택 빠른 반응 퀴즈</h4>
-                            <p class="text-xs text-slate-500 mt-1 leading-relaxed">
-                                문제당 제한 시간 7초! 매장 피크타임 빙의 실전 서라운드 테스트
-                            </p>
-                        </div>
-                        <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-rose-600">
-                            <span>타임어택 도전</span>
-                            <i data-lucide="chevron-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
-                        </div>
-                    </div>
-
-                    <!-- Order Simulation Card -->
-                    <div onclick="app.startCategoryQuiz('scenario')" class="bg-white p-5 rounded-xl border border-slate-200 hover:border-subway-green shadow-sm hover:shadow-md transition cursor-pointer group flex flex-col justify-between sm:col-span-2 lg:col-span-2">
-                        <div class="flex items-start justify-between">
-                            <div class="p-3 bg-indigo-50 text-indigo-600 rounded-xl group-hover:scale-110 transition-transform">
-                                <i data-lucide="user-check" class="w-6 h-6"></i>
-                            </div>
-                            <span class="text-xs bg-indigo-100 text-indigo-800 font-bold px-2 py-1 rounded">실전 포스/주문</span>
-                        </div>
-                        <div class="mt-4">
-                            <h4 class="font-bold text-slate-800 group-hover:text-subway-green transition">실전 손님 주문 시뮤레이션</h4>
-                            <p class="text-xs text-slate-500 mt-1 leading-relaxed">
-                                "이탈리안 비엠티 15cm 하티로 구워주시고 썹픽 소스로 주세요!" 손님의 실제 주문을 듣고 조합을 맞춰보세요.
-                            </p>
-                        </div>
-                        <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-indigo-600">
-                            <span>시뮬레이션 시작</span>
-                            <i data-lucide="chevron-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Key Formula Cheat Sheet Banner -->
-            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
-                <div class="flex items-center justify-between">
-                    <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
-                        <i data-lucide="key" class="w-4 h-4 text-subway-yellow fill-subway-yellow"></i>
-                        알바 필수 암기 암구호 (숫자 공식 요약)
-                    </h3>
-                    <button onclick="app.showPage('recipes')" class="text-xs text-subway-green hover:underline font-semibold">전체 보기</button>
-                </div>
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-                    <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-100">
-                        <span class="font-bold text-subway-green block">이탈리안 비엠티</span>
-                        <span class="text-slate-600">페3 + 살3 + 햄2</span>
-                    </div>
-                    <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-100">
-                        <span class="font-bold text-subway-green block">스파이시 이탈리안</span>
-                        <span class="text-slate-600">페5 + 살5</span>
-                    </div>
-                    <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-100">
-                        <span class="font-bold text-subway-green block">치킨 베이컨 아보카도</span>
-                        <span class="text-slate-600">치킨슬라이스3 + 베2 + 아보1스쿱</span>
-                    </div>
-                    <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-100">
-                        <span class="font-bold text-subway-green block">안창 비프 & 머쉬룸</span>
-                        <span class="text-slate-600">안창 ½스쿱 + 머쉬룸 ½스쿱</span>
-                    </div>
+                <div class="pt-2 flex gap-3">
+                    <button onclick="startCustomQuiz()" class="flex-1 bg-subway-green hover:bg-subway-darkgreen text-white font-extrabold py-3.5 rounded-xl shadow-md transition transform active:scale-98 text-center text-sm sm:text-base">
+                        선택 조건으로 학습 시작하기
+                    </button>
+                    <button onclick="startNotesQuiz()" id="btn-notes-quiz" class="hidden px-5 bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200 font-extrabold rounded-xl text-sm transition flex items-center space-x-1">
+                        <i class="fa-solid fa-rotate-right"></i>
+                        <span>오답 복습</span>
+                    </button>
                 </div>
             </div>
         </section>
 
-        <!-- ================= PAGE 2: RECIPE REFERENCE (도감) ================= -->
-        <section id="page-recipes" class="hidden space-y-6">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div>
-                    <h2 class="text-2xl font-black text-slate-800">써브웨이 21종 마스터 레시피 도감</h2>
-                    <p class="text-xs sm:text-sm text-slate-500 mt-1">공식 샌드위치 메인 재료, 수량, 썹픽 조합 및 구분 팁</p>
+        <!-- ================= VIEW 2: QUIZ RUNNER ================= -->
+        <section id="view-quiz" class="hidden space-y-4">
+            <!-- Progress Bar Top Header -->
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <span id="quiz-progress-text" class="text-sm font-black text-subway-green">01 / 10</span>
+                    <span id="quiz-badge-type" class="bg-slate-100 text-slate-600 text-[11px] font-extrabold px-2 py-0.5 rounded-md">객관식</span>
                 </div>
-                <div class="relative w-full sm:w-64">
-                    <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                    <input type="text" id="recipe-search-input" oninput="app.filterRecipes(this.value)" placeholder="메뉴명 또는 재료 검색..." class="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-subway-green focus:outline-none">
+                <div class="w-32 sm:w-48 bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                    <div id="quiz-progress-bar" class="bg-subway-green h-full w-0 transition-all duration-300"></div>
                 </div>
-            </div>
-
-            <!-- Vegetable Order Banner -->
-            <div class="bg-emerald-800 text-white p-4 rounded-xl shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3">
-                <div class="flex items-center gap-2">
-                    <div class="p-2 bg-white/10 rounded-lg"><i data-lucide="salad" class="w-5 h-5 text-subway-yellow"></i></div>
-                    <div>
-                        <span class="font-extrabold text-sm block text-subway-yellow">야채 공식 8종 쌓기 순서</span>
-                        <span class="text-xs text-emerald-100">양상추 → 토마토 → 오이 → 피클 → 피망 → 양파 → 올리브 → 할라피뇨</span>
-                    </div>
-                </div>
-                <div class="text-xs bg-emerald-900/60 px-3 py-1.5 rounded-lg font-mono text-emerald-200">
-                    암기팁: <strong class="text-white">양-토-오-피-피-양-올-할</strong>
-                </div>
-            </div>
-
-            <!-- Recipe Grid -->
-            <div id="recipe-list-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- Recipe Cards populated by JavaScript -->
-            </div>
-        </section>
-
-        <!-- ================= PAGE 3: WRONG NOTES (오답노트) ================= -->
-        <section id="page-wrong-notes" class="hidden space-y-6">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-4">
-                <div>
-                    <h2 class="text-2xl font-black text-slate-800 flex items-center gap-2">
-                        <i data-lucide="notebook-pen" class="w-6 h-6 text-rose-600"></i>
-                        오답 노트 & 복습 창고
-                    </h2>
-                    <p class="text-xs sm:text-sm text-slate-500 mt-1">자주 헷갈리는 메뉴를 집중적으로 반복하여 숙련도를 높이세요.</p>
-                </div>
-                <div class="flex items-center gap-2">
-                    <button onclick="app.startWrongNotesQuiz()" id="btn-start-wrong-quiz" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-4 py-2 rounded-xl text-xs sm:text-sm shadow transition flex items-center gap-1.5 disabled:opacity-50">
-                        <i data-lucide="play" class="w-4 h-4 fill-white"></i>
-                        오답만 모아서 재시험
-                    </button>
-                    <button onclick="app.clearWrongNotes()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-3 py-2 rounded-xl text-xs transition">
-                        오답 초기화
-                    </button>
-                </div>
-            </div>
-
-            <div id="wrong-notes-empty" class="hidden bg-white p-12 text-center rounded-2xl border border-slate-200 space-y-3">
-                <div class="w-16 h-16 bg-emerald-100 text-subway-green rounded-full flex items-center justify-center mx-auto">
-                    <i data-lucide="sparkles" class="w-8 h-8"></i>
-                </div>
-                <h3 class="text-lg font-bold text-slate-800">오답 노드가 비어있습니다!</h3>
-                <p class="text-xs text-slate-500 max-w-sm mx-auto">퀴즈를 진행하면서 틀린 문제들이 자동으로 이곳에 기록됩니다. 완벽하게 맞힐 때까지 연습해 보세요.</p>
-            </div>
-
-            <div id="wrong-notes-list" class="space-y-3">
-                <!-- Wrong items list dynamically populated -->
-            </div>
-        </section>
-
-        <!-- ================= PAGE 4: ACTIVE QUIZ SCREEN ================= -->
-        <section id="page-quiz" class="hidden space-y-6 max-w-2xl mx-auto">
-            <!-- Quiz Header Bar -->
-            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <button onclick="app.confirmExitQuiz()" class="p-2 hover:bg-slate-100 rounded-lg text-slate-500 transition">
-                        <i data-lucide="x" class="w-5 h-5"></i>
-                    </button>
-                    <div>
-                        <div class="text-xs text-slate-400 font-bold uppercase tracking-wider flex items-center gap-2">
-                            <span id="quiz-type-badge" class="bg-subway-lightgreen text-subway-green px-2 py-0.5 rounded text-[10px] font-extrabold">객관식</span>
-                            <span id="quiz-difficulty-badge" class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-[10px]">초급</span>
-                        </div>
-                        <h3 id="quiz-progress-text" class="text-sm font-extrabold text-slate-800">문제 1 / 10</h3>
-                    </div>
-                </div>
-
-                <!-- Timer / Speed challenge display -->
-                <div id="quiz-timer-container" class="hidden flex items-center gap-2 bg-rose-50 text-rose-600 px-3 py-1.5 rounded-lg border border-rose-100 font-mono font-bold text-sm">
-                    <i data-lucide="timer" class="w-4 h-4 animate-spin"></i>
-                    <span id="quiz-timer-text">07.0s</span>
-                </div>
-
-                <div class="flex items-center gap-2">
-                    <span id="quiz-score-live" class="text-xs font-bold text-subway-green bg-subway-lightgreen px-2.5 py-1 rounded-full">
-                        정답 0
-                    </span>
-                </div>
-            </div>
-
-            <!-- Progress Bar -->
-            <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
-                <div id="quiz-progress-bar" class="bg-subway-green h-full w-0 transition-all duration-300"></div>
-            </div>
-
-            <!-- Main Question Card -->
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-md p-6 space-y-6">
-                <!-- Question Text Header -->
-                <div class="space-y-2 border-b border-slate-100 pb-4">
-                    <span id="question-subtext" class="text-xs text-subway-green font-bold block uppercase tracking-wide">질문</span>
-                    <h2 id="question-title" class="text-lg sm:text-xl font-black text-slate-900 leading-snug">
-                        메뉴 질문 제목이 이 자리에 표시됩니다.
-                    </h2>
-                </div>
-
-                <!-- Dynamic Question Body Area -->
-                <div id="quiz-body-container">
-                    <!-- Dynamic rendering based on Quiz Type -->
-                </div>
-
-                <!-- Submit / Action Button Container -->
-                <div id="quiz-action-container" class="pt-2">
-                    <button id="btn-submit-answer" onclick="app.submitAnswer()" class="w-full bg-subway-green hover:bg-subway-darkgreen text-white font-extrabold py-3.5 px-6 rounded-xl shadow transition text-base flex items-center justify-center gap-2">
-                        <span>정답 확인하기</span>
-                        <i data-lucide="arrow-right" class="w-5 h-5"></i>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Feedback Result Box (Shows after answering) -->
-            <div id="feedback-box" class="hidden bg-white rounded-2xl border-2 p-6 shadow-lg space-y-4 transition-all">
-                <div class="flex items-center justify-between">
-                    <div id="feedback-title" class="flex items-center gap-2 text-lg font-black">
-                        <!-- Correct/Incorrect badge inserted here -->
-                    </div>
-                    <span id="feedback-time-taken" class="text-xs text-slate-400 font-mono">1.2초 소요</span>
-                </div>
-
-                <!-- Detail breakdown -->
-                <div id="feedback-detail" class="text-xs sm:text-sm text-slate-700 bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2 leading-relaxed">
-                    <!-- Dynamic details -->
-                </div>
-
-                <!-- Memory Tip -->
-                <div id="feedback-tip-box" class="bg-subway-lightyellow border border-subway-yellow/40 p-3 rounded-xl text-xs text-amber-900 flex items-start gap-2">
-                    <i data-lucide="lightbulb" class="w-4 h-4 text-subway-darkyellow flex-shrink-0 mt-0.5"></i>
-                    <div>
-                        <strong class="font-bold block">암기 꿀팁:</strong>
-                        <span id="feedback-tip-text">이탈리안 비엠티는 숫자가 3·3·2 순서입니다!</span>
-                    </div>
-                </div>
-
-                <button onclick="app.nextQuestion()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-extrabold py-3 px-6 rounded-xl shadow transition text-sm flex items-center justify-center gap-2">
-                    <span>다음 문제로 이동</span>
-                    <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                <button onclick="exitQuiz()" class="text-slate-400 hover:text-slate-600 text-xs font-bold px-2 py-1">
+                    <i class="fa-solid fa-xmark text-sm"></i> 포기
                 </button>
             </div>
-        </section>
 
-        <!-- ================= PAGE 5: RESULT REPORT ================= -->
-        <section id="page-result" class="hidden space-y-6 max-w-2xl mx-auto">
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden">
-                <!-- Result Header Banner -->
-                <div class="bg-gradient-to-r from-subway-green to-subway-darkgreen text-white p-8 text-center relative">
-                    <div class="inline-flex p-3 bg-white/10 rounded-full mb-3">
-                        <i data-lucide="trophy" class="w-10 h-10 text-subway-yellow"></i>
+            <!-- Quiz Card Panel -->
+            <div class="bg-white rounded-2xl p-5 sm:p-7 shadow-md border border-slate-200 relative min-h-[360px] flex flex-col justify-between">
+                
+                <!-- Question Header -->
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <span id="quiz-menu-tag" class="text-xs font-extrabold text-subway-darkgreen bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-100">
+                            샌드위치 레시피
+                        </span>
+                        <span id="quiz-timer" class="text-xs font-bold text-amber-600 hidden">
+                            <i class="fa-regular fa-clock"></i> <span>15</span>s
+                        </span>
                     </div>
-                    <h2 class="text-2xl sm:text-3xl font-black">퀴즈 세션 완료!</h2>
-                    <p class="text-xs sm:text-sm text-emerald-100 mt-1">수고하셨습니다. 학습 결과 상세 리포트입니다.</p>
+                    <h2 id="quiz-question-text" class="text-lg sm:text-xl font-black text-slate-900 leading-snug tracking-tight">
+                        질문이 여기에 표시됩니다.
+                    </h2>
+                    <p id="quiz-subtext" class="text-xs font-medium text-slate-500 mt-1">
+                        올바른 답안을 선택하거나 입력하세요.
+                    </p>
                 </div>
 
-                <div class="p-6 space-y-6">
-                    <!-- Key Numbers Grid -->
-                    <div class="grid grid-cols-3 gap-3 text-center">
-                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
-                            <span class="text-xs text-slate-500 font-bold block">최종 정답률</span>
-                            <span id="result-score-percent" class="text-2xl sm:text-3xl font-black text-subway-green">0%</span>
-                        </div>
-                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
-                            <span class="text-xs text-slate-500 font-bold block">맞힌 문항</span>
-                            <span id="result-correct-count" class="text-2xl sm:text-3xl font-black text-slate-800">0 / 0</span>
-                        </div>
-                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
-                            <span class="text-xs text-slate-500 font-bold block">평균 속도</span>
-                            <span id="result-avg-speed" class="text-2xl sm:text-3xl font-black text-amber-600">0.0초</span>
-                        </div>
-                    </div>
+                <!-- Dynamic Dynamic Answer Interactive Area -->
+                <div id="quiz-answer-area" class="my-6">
+                    <!-- Content dynamically injected via JS -->
+                </div>
 
-                    <!-- Evaluation Message -->
-                    <div id="result-evaluation-card" class="p-4 rounded-xl bg-subway-lightgreen border border-subway-green/30 text-slate-800 space-y-1">
-                        <h4 id="result-eval-title" class="font-bold text-subway-darkgreen text-sm flex items-center gap-1.5">
-                            <i data-lucide="award" class="w-4 h-4"></i>
-                            훌륭합니다! 매장 준비 완벽!
-                        </h4>
-                        <p id="result-eval-desc" class="text-xs text-slate-600">
-                            대부분의 레시피를 정확히 숙지하고 있습니다.
-                        </p>
+                <!-- Feedback Panel (Appears after answer submission) -->
+                <div id="quiz-feedback" class="hidden rounded-xl p-4 text-xs sm:text-sm font-medium border space-y-2">
+                    <div class="flex items-center space-x-2 font-black text-base" id="feedback-status">
+                        <!-- Correct/Incorrect Badge -->
                     </div>
+                    <div id="feedback-detail" class="text-slate-700 leading-relaxed">
+                        <!-- Details -->
+                    </div>
+                    <div id="feedback-cheat" class="bg-amber-50 text-amber-900 p-2.5 rounded-lg border border-amber-200 font-bold text-xs flex items-start space-x-2">
+                        <i class="fa-solid fa-lightbulb text-amber-500 mt-0.5"></i>
+                        <span id="feedback-cheat-text">암기 팁</span>
+                    </div>
+                </div>
 
-                    <!-- Question Breakdown List -->
-                    <div class="space-y-3">
-                        <h4 class="font-bold text-slate-800 text-sm flex items-center justify-between">
-                            <span>문제별 제출 결과 분석</span>
-                            <span class="text-xs text-slate-400 font-normal">오답은 오답노트에 자동 저장됨</span>
-                        </h4>
-                        <div id="result-breakdown-list" class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar pr-1">
-                            <!-- Items inserted by JS -->
-                        </div>
-                    </div>
+                <!-- Submit / Next Footer Button -->
+                <div class="pt-2 flex justify-end">
+                    <button id="btn-quiz-action" onclick="handleQuizAction()" class="w-full sm:w-auto bg-subway-yellow hover:bg-yellow-400 text-slate-900 font-black px-8 py-3.5 rounded-xl shadow-md transition transform active:scale-95 text-center text-sm sm:text-base">
+                        정답 제출하기
+                    </button>
+                </div>
+            </div>
+        </section>
 
-                    <!-- Action Buttons -->
-                    <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row gap-3">
-                        <button onclick="app.restartQuiz()" class="flex-1 bg-subway-green hover:bg-subway-darkgreen text-white font-extrabold py-3 px-4 rounded-xl shadow transition text-sm flex items-center justify-center gap-2">
-                            <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
-                            동일 조건 다시 풀기
+        <!-- ================= VIEW 3: QUIZ RESULT ================= -->
+        <section id="view-result" class="hidden space-y-6">
+            <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-md border border-slate-200 text-center space-y-6">
+                <div class="inline-flex p-4 rounded-full bg-emerald-50 text-subway-green text-3xl mb-2">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+                <div>
+                    <h2 class="text-2xl font-black text-slate-900">학습 훈련 완료!</h2>
+                    <p class="text-xs font-medium text-slate-500 mt-1">수고하셨습니다. 레시피 숙달도가 기록되었습니다.</p>
+                </div>
+
+                <!-- Score Big Display -->
+                <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 max-w-sm mx-auto">
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Score</span>
+                    <div class="text-4xl sm:text-5xl font-black text-subway-green my-1" id="result-score">
+                        80 <span class="text-lg text-slate-400">/ 100</span>
+                    </div>
+                    <p id="result-comment" class="text-xs font-bold text-slate-600 mt-2">
+                        훌륭합니다! 3·3·2 공식과 썹픽 조합을 잘 기억하고 있네요.
+                    </p>
+                </div>
+
+                <!-- Details Grid -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-bold">
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                        <span class="text-slate-400">맞힌 문제</span>
+                        <div class="text-lg font-black text-emerald-600 mt-1" id="result-correct">0</div>
+                    </div>
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                        <span class="text-slate-400">틀린 문제</span>
+                        <div class="text-lg font-black text-rose-500 mt-1" id="result-wrong">0</div>
+                    </div>
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                        <span class="text-slate-400">소요 시간</span>
+                        <div class="text-lg font-black text-slate-700 mt-1" id="result-time">00:00</div>
+                    </div>
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                        <span class="text-slate-400">오답 저장</span>
+                        <div class="text-lg font-black text-amber-600 mt-1" id="result-saved-notes">0건</div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="pt-4 flex flex-col sm:flex-row gap-3 justify-center">
+                    <button onclick="showView('dashboard')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-6 py-3 rounded-xl text-sm transition">
+                        대시보드로 돌아가기
+                    </button>
+                    <button onclick="startNotesQuiz()" id="btn-result-retry-notes" class="bg-rose-500 hover:bg-rose-600 text-white font-bold px-6 py-3 rounded-xl text-sm transition">
+                        틀린 문제 바로 재시험
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= VIEW 4: RECIPE REFERENCE GUIDE ================= -->
+        <section id="view-guide" class="hidden space-y-5">
+            <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+                    <div>
+                        <h1 class="text-xl font-black text-slate-900">써브웨이 21종 마스터 도감</h1>
+                        <p class="text-xs text-slate-500 mt-0.5">샌드위치 21종 메인 속재료 수량 및 썹픽(Sub Pick) 고정 레시피</p>
+                    </div>
+                    <!-- Search Input -->
+                    <div class="relative">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400 text-xs"></i>
+                        <input type="text" id="guide-search" oninput="renderGuideTable()" placeholder="메뉴명 검색..." class="pl-8 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 w-full sm:w-48 focus:outline-none focus:ring-2 focus:ring-subway-green">
+                    </div>
+                </div>
+
+                <!-- Veggie Flow Summary Banner -->
+                <div class="bg-emerald-50 border border-emerald-200 p-3.5 rounded-xl">
+                    <div class="text-xs font-bold text-subway-darkgreen mb-1.5 flex items-center">
+                        <i class="fa-solid fa-leaf mr-1.5"></i> 공식 야채 토핑 순서 (8단계)
+                    </div>
+                    <div class="text-xs font-extrabold text-slate-700 flex flex-wrap gap-1.5">
+                        <span class="bg-white px-2 py-0.5 rounded border border-emerald-200">1.양상추</span> ➔
+                        <span class="bg-white px-2 py-0.5 rounded border border-emerald-200">2.토마토</span> ➔
+                        <span class="bg-white px-2 py-0.5 rounded border border-emerald-200">3.오이</span> ➔
+                        <span class="bg-white px-2 py-0.5 rounded border border-emerald-200">4.피클</span> ➔
+                        <span class="bg-white px-2 py-0.5 rounded border border-emerald-200">5.피망</span> ➔
+                        <span class="bg-white px-2 py-0.5 rounded border border-emerald-200">6.양파</span> ➔
+                        <span class="bg-white px-2 py-0.5 rounded border border-emerald-200">7.올리브</span> ➔
+                        <span class="bg-white px-2 py-0.5 rounded border border-emerald-200">8.할라피뇨</span>
+                    </div>
+                </div>
+
+                <!-- Guide Table -->
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-600 font-extrabold border-y border-slate-200">
+                                <th class="p-3 w-8 text-center">No</th>
+                                <th class="p-3">메뉴명</th>
+                                <th class="p-3">메인 속재료 & 정확한 수량</th>
+                                <th class="p-3">썹픽 고정 조합 (빵/치즈/소스)</th>
+                                <th class="p-3">암기 팁</th>
+                            </tr>
+                        </thead>
+                        <tbody id="guide-table-body" class="divide-y divide-slate-100 font-medium text-slate-800">
+                            <!-- Rendered by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= VIEW 5: INCORRECT NOTES ================= -->
+        <section id="view-notes" class="hidden space-y-5">
+            <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                    <div>
+                        <h1 class="text-xl font-black text-slate-900">오답 복습 노트</h1>
+                        <p class="text-xs text-slate-500 mt-0.5">퀴즈 풀이 중 틀렸던 문제들이 자동으로 보관됩니다.</p>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button onclick="startNotesQuiz()" id="btn-start-note-quiz" class="bg-subway-green hover:bg-subway-darkgreen text-white font-extrabold px-4 py-2 rounded-xl text-xs shadow-sm transition">
+                            오답 재시험 풀기
                         </button>
-                        <button onclick="app.showPage('wrong-notes')" class="flex-1 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold py-3 px-4 rounded-xl transition text-sm flex items-center justify-center gap-2 border border-rose-200">
-                            <i data-lucide="notebook-pen" class="w-4 h-4"></i>
-                            오답 노트 복습
-                        </button>
-                        <button onclick="app.showPage('dashboard')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 px-4 rounded-xl transition text-sm">
-                            홈으로
+                        <button onclick="clearNotes()" class="bg-slate-100 hover:bg-rose-100 text-slate-500 hover:text-rose-600 font-bold px-3 py-2 rounded-xl text-xs transition">
+                            노트 비우기
                         </button>
                     </div>
+                </div>
+
+                <div id="notes-list" class="space-y-3">
+                    <!-- Rendered by JS -->
                 </div>
             </div>
         </section>
 
     </main>
 
-    <!-- Quiz Settings Setup Modal -->
-    <div id="quiz-setup-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto custom-scrollbar p-6 space-y-6">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                <div class="flex items-center gap-2">
-                    <div class="p-2 bg-subway-lightgreen text-subway-green rounded-lg">
-                        <i data-lucide="sliders" class="w-5 h-5"></i>
-                    </div>
-                    <h3 class="text-lg font-black text-slate-900">맞춤 퀴즈 설정</h3>
-                </div>
-                <button onclick="app.closeQuizModal()" class="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
-            </div>
-
-            <!-- Setup Form -->
-            <form id="quiz-setup-form" onsubmit="app.startConfiguredQuiz(event)" class="space-y-5 text-xs sm:text-sm">
-                <!-- 1. Question Count -->
-                <div class="space-y-2">
-                    <label class="font-bold text-slate-800 block">1. 출제 문항 수</label>
-                    <div class="grid grid-cols-4 gap-2">
-                        <label class="cursor-pointer">
-                            <input type="radio" name="setup-count" value="10" checked class="peer sr-only">
-                            <div class="p-2.5 text-center border rounded-xl peer-checked:bg-subway-green peer-checked:text-white peer-checked:border-subway-green font-bold text-slate-700 hover:border-slate-300">10문제</div>
-                        </label>
-                        <label class="cursor-pointer">
-                            <input type="radio" name="setup-count" value="20" class="peer sr-only">
-                            <div class="p-2.5 text-center border rounded-xl peer-checked:bg-subway-green peer-checked:text-white peer-checked:border-subway-green font-bold text-slate-700 hover:border-slate-300">20문제</div>
-                        </label>
-                        <label class="cursor-pointer">
-                            <input type="radio" name="setup-count" value="30" class="peer sr-only">
-                            <div class="p-2.5 text-center border rounded-xl peer-checked:bg-subway-green peer-checked:text-white peer-checked:border-subway-green font-bold text-slate-700 hover:border-slate-300">30문제</div>
-                        </label>
-                        <label class="cursor-pointer">
-                            <input type="radio" name="setup-count" value="all" class="peer sr-only">
-                            <div class="p-2.5 text-center border rounded-xl peer-checked:bg-subway-green peer-checked:text-white peer-checked:border-subway-green font-bold text-slate-700 hover:border-slate-300">전체</div>
-                        </label>
-                    </div>
-                </div>
-
-                <!-- 2. Question Types Filter -->
-                <div class="space-y-2">
-                    <label class="font-bold text-slate-800 block">2. 출제 문제 유형</label>
-                    <select id="setup-type" class="w-full p-3 border border-slate-300 rounded-xl bg-white font-medium focus:ring-2 focus:ring-subway-green focus:outline-none">
-                        <option value="all">🎲 전체 혼합 랜덤 출제</option>
-                        <option value="choice">A. 객관식 (메뉴 → 재료)</option>
-                        <option value="short">B. 주관식 단답형 (재료 입력)</option>
-                        <option value="fill">C. 빈칸 채우기 (수량 개수)</option>
-                        <option value="ox">D. OX O/X 참거짓 판정</option>
-                        <option value="reverse">F. 재료 보고 메뉴 맞히기</option>
-                        <option value="veg">G. 야채 8종 순서 배열</option>
-                        <option value="error">H. 틀린 레시피 찾기</option>
-                        <option value="scenario">J. 실전 주문 상황 퀴즈</option>
-                    </select>
-                </div>
-
-                <!-- 3. Difficulty Level -->
-                <div class="space-y-2">
-                    <label class="font-bold text-slate-800 block">3. 난이도 설정</label>
-                    <div class="grid grid-cols-3 gap-2">
-                        <label class="cursor-pointer">
-                            <input type="radio" name="setup-difficulty" value="beginner" checked class="peer sr-only">
-                            <div class="p-2.5 text-center border rounded-xl peer-checked:bg-subway-lightgreen peer-checked:text-subway-darkgreen peer-checked:border-subway-green font-bold text-slate-700">
-                                🟢 초급
-                                <span class="block text-[10px] font-normal text-slate-500 mt-0.5">기본 객관식 위주</span>
-                            </div>
-                        </label>
-                        <label class="cursor-pointer">
-                            <input type="radio" name="setup-difficulty" value="intermediate" class="peer sr-only">
-                            <div class="p-2.5 text-center border rounded-xl peer-checked:bg-amber-50 peer-checked:text-amber-800 peer-checked:border-amber-400 font-bold text-slate-700">
-                                🟡 중급
-                                <span class="block text-[10px] font-normal text-slate-500 mt-0.5">수량 빈칸 & OX</span>
-                            </div>
-                        </label>
-                        <label class="cursor-pointer">
-                            <input type="radio" name="setup-difficulty" value="advanced" class="peer sr-only">
-                            <div class="p-2.5 text-center border rounded-xl peer-checked:bg-rose-50 peer-checked:text-rose-800 peer-checked:border-rose-400 font-bold text-slate-700">
-                                🔴 고급
-                                <span class="block text-[10px] font-normal text-slate-500 mt-0.5">주관식 & 실전주문</span>
-                            </div>
-                        </label>
-                    </div>
-                </div>
-
-                <!-- 4. Target Scope -->
-                <div class="space-y-2">
-                    <label class="font-bold text-slate-800 block">4. 출제 대상 범위</label>
-                    <div class="grid grid-cols-2 gap-2">
-                        <label class="cursor-pointer">
-                            <input type="radio" name="setup-target" value="all" checked class="peer sr-only">
-                            <div class="p-2.5 text-center border rounded-xl peer-checked:bg-slate-800 peer-checked:text-white font-bold text-slate-700">전체 21종 메뉴</div>
-                        </label>
-                        <label class="cursor-pointer">
-                            <input type="radio" name="setup-target" value="wrong" class="peer sr-only">
-                            <div class="p-2.5 text-center border rounded-xl peer-checked:bg-rose-600 peer-checked:text-white font-bold text-slate-700">오답노트 등록 항목</div>
-                        </label>
-                    </div>
-                </div>
-
-                <!-- Modal Actions -->
-                <div class="pt-2 flex gap-3">
-                    <button type="button" onclick="app.closeQuizModal()" class="w-1/3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 rounded-xl transition">취소</button>
-                    <button type="submit" class="w-2/3 bg-subway-green hover:bg-subway-darkgreen text-white font-extrabold py-3 rounded-xl shadow transition flex items-center justify-center gap-2">
-                        <i data-lucide="play" class="w-4 h-4 fill-white"></i>
-                        퀴즈 시작하기
-                    </button>
-                </div>
-            </form>
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs font-bold text-slate-400">
+        <div class="max-w-4xl mx-auto px-4">
+            써브웨이 알바 레시피 마스터 퀴즈 &copy; 2026 | 매장 공식 레시피 암기 트레이너
         </div>
-    </div>
+    </footer>
 
-    <!-- Application Script -->
+    <!-- JS Application Logic -->
     <script>
-        /**
-         * Subway 21 Recipe Official Master Database
-         */
-        const SUBWAY_RECIPES = [
-            {
-                id: 'bmt',
-                name: '이탈리안 비엠티',
-                engName: 'Italian B.M.T.',
-                category: '메인',
-                ingredients: '페퍼로니 3장, 살라미 3장, 햄 2장',
-                formula: '페퍼로니 3 + 살라미 3 + 햄 2',
-                bread: '파마산 오레가노 (권장)',
-                cheese: '모짜렐라 치즈',
-                sauce: '스위트 칠리 + 랜치',
-                tip: '3·3·2 공식! 페퍼로니와 살라미가 각각 3장씩 들어가고 햄이 2장입니다.',
-                details: { pepperoni: 3, salami: 3, ham: 2 }
-            },
-            {
-                id: 'spicy_italian',
-                name: '스파이시 이탈리안',
-                engName: 'Spicy Italian',
-                category: '메인',
-                ingredients: '페퍼로니 5장, 살라미 5장',
-                formula: '페퍼로니 5 + 살라미 5',
-                bread: '화이트',
-                cheese: '아메리칸 치즈',
-                sauce: '랜치 + 핫 칠리',
-                tip: '5·5 공식! 햄 없이 페퍼로니 5장과 살라미 5장으로 이루어져 매콤 짭조름합니다.',
-                details: { pepperoni: 5, salami: 5 }
-            },
-            {
-                id: 'egg_mayo',
-                name: '에그마요',
-                engName: 'Egg Mayo',
-                category: '메인',
-                ingredients: '에그마요 2스쿱',
-                formula: '에그마요 2스쿱',
-                bread: '화이트 또는 허니오트',
-                cheese: '슈레드 치즈',
-                sauce: '스위트 칠리 + 랜치',
-                tip: '에그마요 전용 2스쿱! 베이컨 추가 조합이 매우 인기가 높습니다.',
-                details: { eggmayo: 2 }
-            },
-            {
-                id: 'tuna',
-                name: '참치',
-                engName: 'Tuna',
-                category: '메인',
-                ingredients: '참치 2스쿱',
-                formula: '참치 2스쿱',
-                bread: '위트',
-                cheese: '아메리칸 치즈',
-                sauce: '스위트 머스타드 + 마요네즈',
-                tip: '참치는 딱 2스쿱! 가볍게 눌러 담아 고소함을 극대화합니다.',
-                details: { tuna: 2 }
-            },
-            {
-                id: 'blt',
-                name: '비엘티',
-                engName: 'B.L.T.',
-                category: '메인',
-                ingredients: '베이컨 4장',
-                formula: '베이컨 4장',
-                bread: '파마산 오레가노',
-                cheese: '슈레드 치즈',
-                sauce: '스위트 칠리 + 랜치',
-                tip: 'B.L.T.는 오직 베이컨 4장! 에그마요 1스쿱 추가 꿀조합 지식도 챙기세요.',
-                details: { bacon: 4 }
-            },
-            {
-                id: 'chicken_bacon_avocado',
-                name: '치킨 베이컨 아보카도',
-                engName: 'Chicken Bacon Avocado',
-                category: '메인',
-                ingredients: '치킨 슬라이스 3장, 베이컨 2장, 아보카도 1스쿱',
-                formula: '치킨 3 + 베이컨 2 + 아보카도 1스쿱',
-                bread: '위트',
-                cheese: '아메리칸 치즈',
-                sauce: '랜치 + 사우스웨스트 바비큐',
-                tip: '3·2·1 공식! 치킨슬라이스 3장, 베이컨 2장, 아보카도 1스쿱입니다.',
-                details: { chicken_slice: 3, bacon: 2, avocado: 1 }
-            },
-            {
-                id: 'shrimp',
-                name: '쉬림프',
-                engName: 'Shrimp',
-                category: '메인',
-                ingredients: '새우 5마리',
-                formula: '새우 5마리',
-                bread: '위트',
-                cheese: '모짜렐라 치즈',
-                sauce: '스위트 칠리 + 랜치',
-                tip: '통통한 새우 5마리가 정량입니다.',
-                details: { shrimp: 5 }
-            },
-            {
-                id: 'spicy_shrimp',
-                name: '스파이시 쉬림프',
-                engName: 'Spicy Shrimp',
-                category: '메인',
-                ingredients: '스파이시 새우 5마리',
-                formula: '스파이시 새우 5마리',
-                bread: '위트',
-                cheese: '모짜렐라 치즈',
-                sauce: '랜치 + 핫 칠리',
-                tip: '매콤 시즈닝된 새우 5마리가 들어갑니다.',
-                details: { spicy_shrimp: 5 }
-            },
-            {
-                id: 'subway_club',
-                name: '써브웨이 클럽',
-                engName: 'Subway Club',
-                category: '메인',
-                ingredients: '치킨 슬라이스 3장, 햄 1장, 베이컨 2장',
-                formula: '치킨 3 + 햄 1 + 베이컨 2',
-                bread: '허니오트',
-                cheese: '아메리칸 치즈',
-                sauce: '랜치 + 스위트 어니언',
-                tip: '클럽은 치킨슬라이스 3장 + 햄 1장 + 베이컨 2장 조합입니다.',
-                details: { chicken_slice: 3, ham: 1, bacon: 2 }
-            },
-            {
-                id: 'steak_cheese',
-                name: '스테이크 & 치즈',
-                engName: 'Steak & Cheese',
-                category: '메인',
-                ingredients: '스테이크 1스쿱',
-                formula: '스테이크 1스쿱',
-                bread: '화이트 또는 하티',
-                cheese: '아메리칸 치즈',
-                sauce: '사우스웨스트 바비큐 + 스모크 바비큐',
-                tip: '육즙 가득 스테이크 1스쿱! 치즈와 함께 따뜻하게 데워 제공합니다.',
-                details: { steak: 1 }
-            },
-            {
-                id: 'roasted_chicken',
-                name: '로스트 치킨',
-                engName: 'Roasted Chicken',
-                category: '메인',
-                ingredients: '치킨 패티 1장',
-                formula: '치킨 패티 1장',
-                bread: '위트',
-                cheese: '아메리칸 치즈',
-                sauce: '스위트 어니언 + 허니 머스타드',
-                tip: '담백한 오븐 구이 치킨 패티 1장입니다.',
-                details: { chicken_patty: 1 }
-            },
-            {
-                id: 'turkey',
-                name: '터키 (터키 슬라이스)',
-                engName: 'Turkey',
-                category: '메인',
-                ingredients: '터키 슬라이스 4장',
-                formula: '터키 4장',
-                bread: '위트',
-                cheese: '모짜렐라 치즈',
-                sauce: '랜치 + 스위트 어니언',
-                tip: '담백한 터키 슬라이스 4장!',
-                details: { turkey: 4 }
-            },
-            {
-                id: 'turkey_bacon_avocado',
-                name: '터키 베이컨 아보카도',
-                engName: 'Turkey Bacon Avocado',
-                category: '메인',
-                ingredients: '터키 슬라이스 3장, 베이컨 2장, 아보카도 1스쿱',
-                formula: '터키 3 + 베이컨 2 + 아보카도 1스쿱',
-                bread: '위트',
-                cheese: '슈레드 치즈',
-                sauce: '랜치 + 소금/후추',
-                tip: '터키 3장 + 베이컨 2장 + 아보카도 1스쿱 조합입니다.',
-                details: { turkey: 3, bacon: 2, avocado: 1 }
-            },
-            {
-                id: 'veggie_delite',
-                name: '베지',
-                engName: 'Veggie Delite',
-                category: '메인',
-                ingredients: '메인 고기/패티 없음 (기본 야채 8종)',
-                formula: '기본 야채 8종 + 치즈',
-                bread: '위트',
-                cheese: '아메리칸 치즈',
-                sauce: '올리브 오일 + 레드와인 식초',
-                tip: '메인 재료 없이 순수 야채와 치즈로 깔끔하게 구성됩니다.',
-                details: { veggie_only: true }
-            },
-            {
-                id: 'subway_melt',
-                name: '써브웨이 멜트',
-                engName: 'Subway Melt',
-                category: '메인',
-                ingredients: '터키 2장, 햄 2장, 베이컨 2장',
-                formula: '터키 2 + 햄 2 + 베이컨 2',
-                bread: '파마산 오레가노',
-                cheese: '아메리칸 치즈',
-                sauce: '스위트 칠리 + 랜치',
-                tip: '2·2·2 트리플 공식! 터키 2, 햄 2, 베이컨 2장으로 녹아내리는 풍미!',
-                details: { turkey: 2, ham: 2, bacon: 2 }
-            },
-            {
-                id: 'meatball',
-                name: '미트볼',
-                engName: 'Meatball Marinara',
-                category: '메인',
-                ingredients: '미트볼 4개 (마리나라 소스)',
-                formula: '미트볼 4개',
-                bread: '화이트 또는 파마산 오레가노',
-                cheese: '모짜렐라 치즈',
-                sauce: '마리나라 소스 (기본 버무림)',
-                tip: '촉촉한 미트볼 4개와 풍부한 마리나라 소스의 조화.',
-                details: { meatball: 4 }
-            },
-            {
-                id: 'anchang_beef_mushroom',
-                name: '안창 비프 & New 머쉬룸',
-                engName: 'Anchang Beef & New Mushroom',
-                category: '메인',
-                ingredients: '안창살 ½스쿱, 머쉬룸 ½스쿱',
-                formula: '안창살 ½스쿱 + 머쉬룸 ½스쿱',
-                bread: '파마산 오레가노',
-                cheese: '모짜렐라 치즈',
-                sauce: '스모크 바비큐 + 후추',
-                tip: '반반 반스쿱 공식! 안창살 ½스쿱과 머쉬룸 ½스쿱이 정확한 조합입니다.',
-                details: { anchang: 0.5, mushroom: 0.5 }
-            },
-            {
-                id: 'ham',
-                name: '햄',
-                engName: 'Ham',
-                category: '메인',
-                ingredients: '햄 4장',
-                formula: '햄 4장',
-                bread: '화이트',
-                cheese: '아메리칸 치즈',
-                sauce: '사우전 아일랜드',
-                tip: '클래식의 정석! 깔끔하게 햄 4장 들어갑니다.',
-                details: { ham: 4 }
-            },
-            {
-                id: 'chicken_slice',
-                name: '치킨 슬라이스',
-                engName: 'Chicken Slice',
-                category: '메인',
-                ingredients: '치킨 슬라이스 4장',
-                formula: '치킨 슬라이스 4장',
-                bread: '위트',
-                cheese: '아메리칸 치즈',
-                sauce: '스위트 어니언',
-                tip: '단독 치킨 슬라이스는 4장 들어갑니다. (클럽/베이컨아보카도는 3장)',
-                details: { chicken_slice: 4 }
-            },
-            {
-                id: 'rotisserie_chicken',
-                name: '로티세리 바비큐 치킨',
-                engName: 'Rotisserie-Style Chicken',
-                category: '메인',
-                ingredients: '로티세리 치킨 1스쿱',
-                formula: '로티세리 치킨 1스쿱',
-                bread: '파마산 오레가노',
-                cheese: '아메리칸 치즈',
-                sauce: '스모크 바비큐 + 랜치',
-                tip: '손으로 결대로 찢은 담백한 로티세리 치킨 1스쿱!',
-                details: { rotisserie: 1 }
-            },
-            {
-                id: 'pulled_pork',
-                name: '풀드포크 바비큐',
-                engName: 'Pulled Pork Barbecue',
-                category: '메인',
-                ingredients: '풀드포크 1스쿱',
-                formula: '풀드포크 1스쿱',
-                bread: '파마산 오레가노',
-                cheese: '아메리칸 치즈',
-                sauce: '스모크 바비큐',
-                tip: '훈제향 가득한 풀드포크 1스쿱!',
-                details: { pulled_pork: 1 }
-            }
+        /* ==========================================================================
+           1. MASTER DATA (PDF 데이터와 100% 동일)
+           ========================================================================== */
+        const VEGGIE_ORDER = [
+            "양상추", "토마토", "오이", "피클", "피망", "양파", "올리브", "할라피뇨"
         ];
 
-        // Official Vegetable Standard Order (8 Items)
-        const OFFICIAL_VEGETABLES = [
-            '양상추', '토마토', '오이', '피클', '피망', '양파', '올리브', '할라피뇨'
+        const SUBWAY_DATA = [
+            { id: 1, name: "안창 비프 & New 머쉬룸", main: "안창살 1/2스쿱 + 머쉬룸 1/2스쿱", bread: "위트", cheese: "모차렐라 치즈", sauce: "랜치 + 스위트 어니언", tip: "고기 반 + 버섯 반", best: true },
+            { id: 2, name: "스테이크 & 치즈", main: "스테이크 1스쿱", bread: "화이트", cheese: "아메리칸 치즈", sauce: "마요네즈 + 사우스웨스트 치폴레", tip: "소고기 1스쿱", best: true },
+            { id: 3, name: "이탈리안 비엠티 ™", main: "페퍼로니 3장 + 살라미 3장 + 햄 2장", bread: "파마산 오레가노", cheese: "슈레드 치즈", sauce: "랜치 + 스위트 어니언", tip: "3·3·2 공식 (총 8장)", best: true },
+            { id: 4, name: "로티세리 바비큐 치킨", main: "로티세리 치킨 1스쿱", bread: "화이트", cheese: "아메리칸 치즈", sauce: "랜치 + 스위트 칠리", tip: "바비큐 치킨 1스쿱", best: true },
+            { id: 5, name: "에그마요", main: "에그마요 2스쿱", bread: "플랫 브레드", cheese: "슈레드 치즈", sauce: "랜치 + 스위트 칠리", tip: "더블 2스쿱", best: true },
+            { id: 6, name: "안창 비프", main: "안창 비프 1스쿱", bread: "화이트", cheese: "아메리칸 치즈", sauce: "랜치 + 스위트 칠리", tip: "안창살 1스쿱", best: false },
+            { id: 7, name: "치킨 베이컨 아보카도", main: "치킨 슬라이스 3장 + 베이컨 2장 + 아보카도 1스쿱", bread: "위트", cheese: "모차렐라 치즈", sauce: "마요네즈 + 저당 크리미 어니언", tip: "3·2·1 공식", best: false },
+            { id: 8, name: "스파이시 쉬림프", main: "새우 5마리 (시즈닝)", bread: "화이트", cheese: "아메리칸 치즈", sauce: "마요네즈 + 저당 크리미 어니언", tip: "통새우 5마리", best: false },
+            { id: 9, name: "쉬림프", main: "새우 5마리", bread: "파마산 오레가노", cheese: "슈레드 치즈", sauce: "랜치 + 스위트 칠리", tip: "통새우 5마리", best: false },
+            { id: 10, name: "로스트 치킨", main: "치킨 브레스트 1개", bread: "그래인", cheese: "모차렐라 치즈", sauce: "올리브 오일 + 허니 머스타드", tip: "통닭가슴살 패티 1개", best: false },
+            { id: 11, name: "풀드포크 바비큐", main: "풀드포크 1스쿱", bread: "허니 오트", cheese: "아메리칸 치즈", sauce: "랜치 + 스모크 바비큐", tip: "돼지고기 1스쿱", best: false },
+            { id: 12, name: "써브웨이 클럽 ™", main: "치킨 슬라이스 2장 + 잠봉 1장 + 베이컨 2장", bread: "플랫 브레드", cheese: "슈레드 치즈", sauce: "랜치 + 홀스래디쉬", tip: "2·1·2 공식", best: false },
+            { id: 13, name: "치킨 데리야끼", main: "치킨 데리야끼 1스쿱", bread: "화이트", cheese: "아메리칸 치즈", sauce: "마요네즈 + 홀스래디쉬", tip: "양념 치킨 1스쿱", best: false },
+            { id: 14, name: "잠봉", main: "잠봉 햄 5장", bread: "화이트", cheese: "아메리칸 치즈", sauce: "허니 머스타드 + 후추", tip: "잠봉 햄 5장", best: false },
+            { id: 15, name: "스파이시 이탈리안", main: "페퍼로니 5장 + 살라미 5장", bread: "플랫 브레드", cheese: "슈레드 치즈", sauce: "랜치 + 저당 크리미 어니언", tip: "5·5 공식 (총 10장)", best: false },
+            { id: 16, name: "비엘티 (B.L.T.)", main: "베이컨 4장", bread: "위트", cheese: "모차렐라 치즈", sauce: "랜치 + 사우스웨스트 치폴레", tip: "베이컨 4장", best: false },
+            { id: 17, name: "치킨 슬라이스", main: "치킨 슬라이스 4장", bread: "그래인", cheese: "모차렐라 치즈", sauce: "마요네즈 + 저당 크리미 어니언", tip: "닭가슴살 햄 4장", best: false },
+            { id: 18, name: "New 머쉬룸", main: "머쉬룸 1스쿱", bread: "그래인", cheese: "모차렐라 치즈", sauce: "랜치", tip: "버섯 1스쿱", best: false },
+            { id: 19, name: "참치", main: "참치 2스쿱", bread: "그래인", cheese: "모차렐라 치즈", sauce: "랜치 + 스위트 칠리", tip: "더블 2스쿱", best: false },
+            { id: 20, name: "에그 슬라이스", main: "에그 1개 (슬라이스)", bread: "위트", cheese: "모차렐라 치즈", sauce: "랜치 + 스위트 칠리", tip: "삶은 달걀 1개", best: false },
+            { id: 21, name: "베지", main: "고기 없음 (각종 야채)", bread: "허니 오트", cheese: "아메리칸 치즈", sauce: "올리브 오일 + 레드와인 식초", tip: "야채 전용", best: false }
         ];
 
-        /**
-         * State & Quiz Engine Manager
-         */
-        class SubwayQuizApp {
-            constructor() {
-                this.recipes = SUBWAY_RECIPES;
-                this.veggies = OFFICIAL_VEGETABLES;
-                
-                // Persistence state
-                this.stats = this.loadStats();
-                this.wrongNotes = this.loadWrongNotes();
-
-                // Quiz session state
-                this.session = null;
-                this.timerInterval = null;
-
-                this.initIcons();
-                this.updateUIStats();
-            }
-
-            initIcons() {
-                if (window.lucide) {
-                    lucide.createIcons();
-                }
-            }
-
-            // LocalStorage Helpers
-            loadStats() {
-                const stored = localStorage.getItem('subway_quiz_stats');
-                return stored ? JSON.parse(stored) : {
-                    totalSolved: 0,
-                    correctCount: 0,
-                    totalTimeSec: 0,
-                    menuAccuracy: {} // { bmt: { asked: 0, correct: 0 } }
-                };
-            }
-
-            saveStats() {
-                localStorage.setItem('subway_quiz_stats', JSON.stringify(this.stats));
-            }
-
-            loadWrongNotes() {
-                const stored = localStorage.getItem('subway_quiz_wrong_notes');
-                return stored ? JSON.parse(stored) : []; // array of recipe IDs
-            }
-
-            saveWrongNotes() {
-                localStorage.setItem('subway_quiz_wrong_notes', JSON.stringify(this.wrongNotes));
-            }
-
-            updateUIStats() {
-                document.getElementById('stat-total-solved').innerText = `${this.stats.totalSolved}개`;
-                
-                const accuracy = this.stats.totalSolved > 0 
-                    ? Math.round((this.stats.correctCount / this.stats.totalSolved) * 100) 
-                    : 0;
-                document.getElementById('stat-accuracy').innerText = `정답률 ${accuracy}%`;
-
-                const avgTime = this.stats.totalSolved > 0 
-                    ? (this.stats.totalTimeSec / this.stats.totalSolved).toFixed(1) 
-                    : '0.0';
-                document.getElementById('stat-avg-speed').innerText = `${avgTime}초`;
-
-                // Unique wrong count
-                const wrongBadge = document.getElementById('wrong-count-badge');
-                document.getElementById('stat-wrong-count').innerText = `${this.wrongNotes.length}개`;
-                if (this.wrongNotes.length > 0) {
-                    wrongBadge.innerText = this.wrongNotes.length;
-                    wrongBadge.classList.remove('hidden');
-                } else {
-                    wrongBadge.classList.add('hidden');
-                }
-
-                // Find weakest menu item
-                let weakestName = '데이터 수집 중';
-                let lowestAcc = 101;
-                Object.keys(this.stats.menuAccuracy).forEach(id => {
-                    const rec = this.recipes.find(r => r.id === id);
-                    if (rec) {
-                        const data = this.stats.menuAccuracy[id];
-                        if (data.asked >= 2) {
-                            const acc = (data.correct / data.asked) * 100;
-                            if (acc < lowestAcc) {
-                                lowestAcc = acc;
-                                weakestName = `${rec.name} (${Math.round(acc)}%)`;
-                            }
-                        }
-                    }
-                });
-                document.getElementById('stat-weakest-menu').innerText = weakestName;
-            }
-
-            // Navigation Page Controller
-            showPage(pageId) {
-                ['dashboard', 'recipes', 'wrong-notes', 'quiz', 'result'].forEach(id => {
-                    const el = document.getElementById(`page-${id}`);
-                    if (el) el.classList.add('hidden');
-                    
-                    const navBtn = document.getElementById(`nav-${id}`);
-                    if (navBtn) {
-                        navBtn.classList.remove('bg-white/20', 'bg-white/10');
-                    }
-                });
-
-                const activePage = document.getElementById(`page-${pageId}`);
-                if (activePage) activePage.classList.remove('hidden');
-
-                const activeNav = document.getElementById(`nav-${pageId}`);
-                if (activeNav) activeNav.classList.add('bg-white/20');
-
-                if (pageId === 'recipes') {
-                    this.renderRecipeList();
-                } else if (pageId === 'wrong-notes') {
-                    this.renderWrongNotes();
-                }
-
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-                this.initIcons();
-            }
-
-            // Recipe Reference Renderer
-            renderRecipeList(filter = '') {
-                const container = document.getElementById('recipe-list-container');
-                container.innerHTML = '';
-
-                const searchLower = filter.toLowerCase().trim();
-                const filtered = this.recipes.filter(r => 
-                    r.name.toLowerCase().includes(searchLower) ||
-                    r.ingredients.toLowerCase().includes(searchLower) ||
-                    r.formula.toLowerCase().includes(searchLower)
-                );
-
-                if (filtered.length === 0) {
-                    container.innerHTML = `
-                        <div class="col-span-2 bg-white p-8 text-center rounded-xl border border-slate-200 text-slate-500">
-                            검색 결과에 해당하는 레시피가 없습니다.
-                        </div>
-                    `;
-                    return;
-                }
-
-                filtered.forEach(r => {
-                    const card = document.createElement('div');
-                    card.className = "bg-white rounded-xl border border-slate-200 p-5 shadow-sm space-y-3 hover:border-subway-green transition";
-                    card.innerHTML = `
-                        <div class="flex items-start justify-between border-b border-slate-100 pb-3">
-                            <div>
-                                <h3 class="font-black text-slate-900 text-lg flex items-center gap-2">
-                                    ${r.name}
-                                    <span class="text-xs font-normal text-slate-400">(${r.engName})</span>
-                                </h3>
-                                <span class="text-xs font-bold text-subway-green bg-subway-lightgreen px-2 py-0.5 rounded mt-1 inline-block">
-                                    공식: ${r.formula}
-                                </span>
-                            </div>
-                            <button onclick="app.toggleBookmark('${r.id}')" class="text-slate-300 hover:text-subway-yellow transition">
-                                <i data-lucide="star" class="w-5 h-5 ${this.wrongNotes.includes(r.id) ? 'fill-subway-yellow text-subway-yellow' : ''}"></i>
-                            </button>
-                        </div>
-
-                        <div class="space-y-1.5 text-xs text-slate-700">
-                            <div><strong class="text-slate-900">메인 재료:</strong> ${r.ingredients}</div>
-                            <div><strong class="text-slate-900">권장 빵/치즈:</strong> ${r.bread} / ${r.cheese}</div>
-                            <div><strong class="text-slate-900">썹픽 소스:</strong> <span class="text-amber-800 font-medium">${r.sauce}</span></div>
-                        </div>
-
-                        <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-100 text-xs text-slate-600 flex items-start gap-1.5">
-                            <i data-lucide="lightbulb" class="w-4 h-4 text-subway-yellow flex-shrink-0 mt-0.5"></i>
-                            <span>${r.tip}</span>
-                        </div>
-                    `;
-                    container.appendChild(card);
-                });
-
-                this.initIcons();
-            }
-
-            filterRecipes(val) {
-                this.renderRecipeList(val);
-            }
-
-            toggleBookmark(recipeId) {
-                if (this.wrongNotes.includes(recipeId)) {
-                    this.wrongNotes = this.wrongNotes.filter(id => id !== recipeId);
-                } else {
-                    this.wrongNotes.push(recipeId);
-                }
-                this.saveWrongNotes();
-                this.updateUIStats();
-                this.renderRecipeList(document.getElementById('recipe-search-input').value);
-            }
-
-            // Wrong Notes Render
-            renderWrongNotes() {
-                const list = document.getElementById('wrong-notes-list');
-                const empty = document.getElementById('wrong-notes-empty');
-                const btnQuiz = document.getElementById('btn-start-wrong-quiz');
-
-                list.innerHTML = '';
-
-                if (this.wrongNotes.length === 0) {
-                    empty.classList.remove('hidden');
-                    btnQuiz.disabled = true;
-                    return;
-                }
-
-                empty.classList.add('hidden');
-                btnQuiz.disabled = false;
-
-                this.wrongNotes.forEach(id => {
-                    const r = this.recipes.find(item => item.id === id);
-                    if (!r) return;
-
-                    const card = document.createElement('div');
-                    card.className = "bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between gap-4";
-                    card.innerHTML = `
-                        <div class="space-y-1">
-                            <h4 class="font-extrabold text-slate-900 text-base">${r.name}</h4>
-                            <p class="text-xs text-subway-green font-bold">재료: ${r.ingredients}</p>
-                            <p class="text-xs text-slate-500">${r.tip}</p>
-                        </div>
-                        <button onclick="app.removeWrongNote('${r.id}')" class="p-2 text-rose-500 hover:bg-rose-50 rounded-lg text-xs font-bold transition flex items-center gap-1">
-                            <i data-lucide="trash-2" class="w-4 h-4"></i>
-                            삭제
-                        </button>
-                    `;
-                    list.appendChild(card);
-                });
-
-                this.initIcons();
-            }
-
-            removeWrongNote(id) {
-                this.wrongNotes = this.wrongNotes.filter(item => item !== id);
-                this.saveWrongNotes();
-                this.updateUIStats();
-                this.renderWrongNotes();
-            }
-
-            clearWrongNotes() {
-                if (confirm('오답 노트를 모두 비우시겠습니까?')) {
-                    this.wrongNotes = [];
-                    this.saveWrongNotes();
-                    this.updateUIStats();
-                    this.renderWrongNotes();
-                }
-            }
-
-            // Quiz Config Modal Control
-            openQuizModal() {
-                document.getElementById('quiz-setup-modal').classList.remove('hidden');
-            }
-
-            closeQuizModal() {
-                document.getElementById('quiz-setup-modal').classList.add('hidden');
-            }
-
-            startConfiguredQuiz(event) {
-                event.preventDefault();
-                const form = document.getElementById('quiz-setup-form');
-                
-                const countVal = form.querySelector('input[name="setup-count"]:checked').value;
-                const typeVal = document.getElementById('setup-type').value;
-                const diffVal = form.querySelector('input[name="setup-difficulty"]:checked').value;
-                const targetVal = form.querySelector('input[name="setup-target"]:checked').value;
-
-                this.closeQuizModal();
-                this.initQuizSession({
-                    count: countVal === 'all' ? 999 : parseInt(countVal),
-                    type: typeVal,
-                    difficulty: diffVal,
-                    target: targetVal
-                });
-            }
-
-            startQuickQuiz() {
-                this.initQuizSession({ count: 10, type: 'all', difficulty: 'beginner', target: 'all' });
-            }
-
-            startCategoryQuiz(category) {
-                if (category === 'main') {
-                    this.initQuizSession({ count: 10, type: 'choice', difficulty: 'beginner', target: 'all' });
-                } else if (category === 'veg') {
-                    this.initQuizSession({ count: 5, type: 'veg', difficulty: 'intermediate', target: 'all' });
-                } else if (category === 'sauce') {
-                    this.initQuizSession({ count: 10, type: 'scenario', difficulty: 'intermediate', target: 'all' });
-                } else if (category === 'speed') {
-                    this.initQuizSession({ count: 10, type: 'all', difficulty: 'intermediate', target: 'all', isSpeed: true });
-                } else if (category === 'scenario') {
-                    this.initQuizSession({ count: 10, type: 'scenario', difficulty: 'advanced', target: 'all' });
-                }
-            }
-
-            startWrongNotesQuiz() {
-                if (this.wrongNotes.length === 0) return;
-                this.initQuizSession({ count: this.wrongNotes.length, type: 'all', difficulty: 'intermediate', target: 'wrong' });
-            }
-
-            /**
-             * QUIZ GENERATOR & SESSION ENGINE
-             */
-            initQuizSession(config) {
-                // Select pool
-                let recipePool = [...this.recipes];
-                if (config.target === 'wrong' && this.wrongNotes.length > 0) {
-                    recipePool = this.recipes.filter(r => this.wrongNotes.includes(r.id));
-                }
-
-                if (recipePool.length === 0) recipePool = [...this.recipes];
-
-                // Generate Question Bank
-                const questions = [];
-                const targetCount = Math.min(config.count, recipePool.length * 3);
-
-                for (let i = 0; i < targetCount; i++) {
-                    const randomRecipe = recipePool[Math.floor(Math.random() * recipePool.length)];
-                    let qType = config.type;
-
-                    if (qType === 'all') {
-                        const types = ['choice', 'short', 'fill', 'ox', 'reverse', 'veg', 'error', 'scenario'];
-                        qType = types[Math.floor(Math.random() * types.length)];
-                    }
-
-                    const q = this.createQuestionData(qType, randomRecipe, config.difficulty);
-                    if (q) questions.push(q);
-                }
-
-                this.session = {
-                    config,
-                    questions,
-                    currentIndex: 0,
-                    correctCount: 0,
-                    results: [],
-                    startTime: null,
-                    questionStartTime: null,
-                    isSpeedMode: config.isSpeed || false,
-                    speedTimer: null
-                };
-
-                this.showPage('quiz');
-                this.loadQuestion();
-            }
-
-            createQuestionData(type, recipe, difficulty) {
-                const id = recipe.id;
-
-                switch (type) {
-                    case 'choice': {
-                        // Choice: Menu -> Ingredients
-                        const wrongRecipes = this.recipes.filter(r => r.id !== id);
-                        this.shuffleArray(wrongRecipes);
-                        const dist1 = wrongRecipes[0].ingredients;
-                        const dist2 = wrongRecipes[1].ingredients;
-                        const dist3 = wrongRecipes[2].ingredients;
-
-                        const options = [recipe.ingredients, dist1, dist2, dist3];
-                        this.shuffleArray(options);
-
-                        return {
-                            type: 'choice',
-                            recipe,
-                            title: `[${recipe.name}]의 정확한 메인 재료와 수량은?`,
-                            subtext: '객관식 메뉴 재료 맞히기',
-                            options,
-                            correctAnswer: recipe.ingredients,
-                            tip: recipe.tip
-                        };
-                    }
-
-                    case 'short': {
-                        // Short Answer
-                        return {
-                            type: 'short',
-                            recipe,
-                            title: `[${recipe.name}]의 메인 재료와 정확한 수량을 입력하세요.`,
-                            subtext: '주관식 단답형 (띄어쓰기 자율, 수량 필수 포함)',
-                            correctAnswer: recipe.ingredients,
-                            tip: recipe.tip
-                        };
-                    }
-
-                    case 'fill': {
-                        // Fill in blanks for quantities
-                        if (recipe.id === 'bmt') {
-                            return {
-                                type: 'fill',
-                                recipe,
-                                title: `이탈리안 비엠티의 재료 수량 빈칸 채우기`,
-                                subtext: '숫자만 정확히 입력하세요.',
-                                blanks: [
-                                    { label: '페퍼로니', key: 'pep', ans: '3' },
-                                    { label: '살라미', key: 'sal', ans: '3' },
-                                    { label: '햄', key: 'ham', ans: '2' }
-                                ],
-                                tip: '비엠티는 3·3·2 공식입니다.'
-                            };
-                        } else if (recipe.id === 'spicy_italian') {
-                            return {
-                                type: 'fill',
-                                recipe,
-                                title: `스파이시 이탈리안의 재료 수량 빈칸 채우기`,
-                                subtext: '숫자만 입력하세요.',
-                                blanks: [
-                                    { label: '페퍼로니', key: 'pep', ans: '5' },
-                                    { label: '살라미', key: 'sal', ans: '5' }
-                                ],
-                                tip: '스파이시 이탈리안은 5·5 공식입니다.'
-                            };
-                        } else if (recipe.id === 'blt') {
-                            return {
-                                type: 'fill',
-                                recipe,
-                                title: `비엘티(B.L.T.)의 베이컨 수량 빈칸 채우기`,
-                                subtext: '숫자만 입력하세요.',
-                                blanks: [{ label: '베이컨', key: 'bac', ans: '4' }],
-                                tip: 'B.L.T.는 베이컨 4장입니다.'
-                            };
-                        } else {
-                            // Generic fill
-                            return {
-                                type: 'fill',
-                                recipe,
-                                title: `[${recipe.name}] 메인 공식 수량 빈칸 채우기`,
-                                subtext: '정확한 조합을 선택하거나 작성하세요.',
-                                blanks: [{ label: recipe.formula.split(' ')[0] || '수량', key: 'gen', ans: recipe.formula }],
-                                tip: recipe.tip
-                            };
-                        }
-                    }
-
-                    case 'ox': {
-                        // True or False Quiz
-                        const isTrue = Math.random() > 0.5;
-                        let statement = '';
-                        let correctAns = isTrue ? 'O' : 'X';
-
-                        if (isTrue) {
-                            statement = `[${recipe.name}]의 레시피는 "${recipe.ingredients}" 이다.`;
-                        } else {
-                            const other = this.recipes.find(r => r.id !== id);
-                            statement = `[${recipe.name}]의 레시피는 "${other.ingredients}" 이다.`;
-                        }
-
-                        return {
-                            type: 'ox',
-                            recipe,
-                            title: statement,
-                            subtext: 'OX 레시피 진위 판정',
-                            options: ['O', 'X'],
-                            correctAnswer: correctAns,
-                            tip: `실제 ${recipe.name} 정답: ${recipe.ingredients}`
-                        };
-                    }
-
-                    case 'reverse': {
-                        // Recipe -> Menu
-                        const wrongRecipes = this.recipes.filter(r => r.id !== id);
-                        this.shuffleArray(wrongRecipes);
-                        const options = [recipe.name, wrongRecipes[0].name, wrongRecipes[1].name, wrongRecipes[2].name];
-                        this.shuffleArray(options);
-
-                        return {
-                            type: 'choice',
-                            recipe,
-                            title: `메인 재료 "${recipe.ingredients}" 에 해당하는 메뉴는?`,
-                            subtext: '재료 보고 메뉴 맞히기',
-                            options,
-                            correctAnswer: recipe.name,
-                            tip: recipe.tip
-                        };
-                    }
-
-                    case 'veg': {
-                        // Vegetable Sequence Order
-                        const shuffledVeg = [...this.veggies];
-                        this.shuffleArray(shuffledVeg);
-
-                        return {
-                            type: 'veg',
-                            recipe: { name: '공식 야채 8종 순서' },
-                            title: '야채 8종의 공식 쌓기 순서대로 선택하여 나열하세요.',
-                            subtext: '터치하거나 클릭하여 1번부터 8번 순서대로 채우세요.',
-                            shuffledVeg,
-                            correctOrder: [...this.veggies],
-                            tip: '공식 순서: 양상추 → 토마토 → 오이 → 피클 → 피망 → 양파 → 올리브 → 할라피뇨 (양-토-오-피-피-양-올-할)'
-                        };
-                    }
-
-                    case 'error': {
-                        // Find Incorrect Recipe
-                        const errorOptions = [
-                            `[${recipe.name}] : ${recipe.ingredients} (정상)`,
-                            `이탈리안 비엠티 : 페퍼로니 5장 + 살라미 5장 (오류)`,
-                            `에그마요 : 에그마요 2스쿱 (정상)`,
-                            `비엘티 : 베이컨 4장 (정상)`
-                        ];
-                        if (recipe.id === 'bmt') {
-                            errorOptions[1] = `스파이시 이탈리안 : 페퍼로니 3장 + 햄 2장 (오류)`;
-                        }
-
-                        this.shuffleArray(errorOptions);
-                        const correctOpt = errorOptions.find(o => o.includes('(오류)'));
-
-                        return {
-                            type: 'choice',
-                            recipe,
-                            title: '다음 중 레시피 수량 또는 조합에 오류가 있는 항목은?',
-                            subtext: '틀린 레시피 찾기',
-                            options: errorOptions,
-                            correctAnswer: correctOpt,
-                            tip: '스파이시 이탈리안은 페5+살5, 비엠티는 페3+살3+햄2 입니다.'
-                        };
-                    }
-
-                    case 'scenario': {
-                        // Real practice customer order simulation
-                        return {
-                            type: 'choice',
-                            recipe,
-                            title: `[손님 주문] "${recipe.name} 15cm 썹픽 조합으로 준비해 주세요!" 이때 들어가야 할 소스 조합은?`,
-                            subtext: '실전 매장 썹픽(SubPick) 소스 맞히기',
-                            options: [
-                                recipe.sauce,
-                                '스위트 어니언 + 허니 머스타드',
-                                '올리브 오일 + 후추',
-                                '핫 칠리 + 마요네즈'
-                            ].sort(() => Math.random() - 0.5),
-                            correctAnswer: recipe.sauce,
-                            tip: `${recipe.name}의 공식 추천 썹픽 소스는 [${recipe.sauce}] 입니다.`
-                        };
-                    }
-
-                    default:
-                        return this.createQuestionData('choice', recipe, difficulty);
-                }
-            }
-
-            shuffleArray(arr) {
-                for (let i = arr.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [arr[i], arr[j]] = [arr[j], arr[i]];
-                }
-            }
-
-            // Load & Display Question
-            loadQuestion() {
-                const q = this.session.questions[this.session.currentIndex];
-                const total = this.session.questions.length;
-                const currentIdx = this.session.currentIndex + 1;
-
-                // Update UI Header Progress
-                document.getElementById('quiz-progress-text').innerText = `문제 ${currentIdx} / ${total}`;
-                document.getElementById('quiz-progress-bar').style.width = `${(currentIdx / total) * 100}%`;
-                document.getElementById('quiz-type-badge').innerText = q.subtext || '퀴즈';
-                document.getElementById('quiz-score-live').innerText = `정답 ${this.session.correctCount}`;
-
-                // Question Header
-                document.getElementById('question-subtext').innerText = `Q${currentIdx}. ${q.subtext}`;
-                document.getElementById('question-title').innerText = q.title;
-
-                // Hide feedback box & enable action button
-                document.getElementById('feedback-box').classList.add('hidden');
-                const actionBtn = document.getElementById('btn-submit-answer');
-                actionBtn.disabled = false;
-                actionBtn.classList.remove('hidden');
-
-                // Speed timer handler
-                const timerContainer = document.getElementById('quiz-timer-container');
-                if (this.session.isSpeedMode) {
-                    timerContainer.classList.remove('hidden');
-                    this.startSpeedTimer(7.0);
-                } else {
-                    timerContainer.classList.add('hidden');
-                }
-
-                // Render dynamic question body
-                const bodyContainer = document.getElementById('quiz-body-container');
-                bodyContainer.innerHTML = '';
-
-                this.session.questionStartTime = Date.now();
-
-                if (q.type === 'choice') {
-                    const grid = document.createElement('div');
-                    grid.className = 'grid grid-cols-1 sm:grid-cols-2 gap-3';
-                    q.options.forEach((opt, idx) => {
-                        const btn = document.createElement('button');
-                        btn.type = 'button';
-                        btn.className = 'quiz-option-btn text-left p-4 rounded-xl border border-slate-200 hover:border-subway-green hover:bg-subway-lightgreen/50 text-xs sm:text-sm font-semibold transition flex items-center justify-between group';
-                        btn.onclick = () => this.selectOption(btn);
-                        btn.dataset.value = opt;
-                        btn.innerHTML = `
-                            <span class="flex items-center gap-2">
-                                <span class="w-6 h-6 rounded-full bg-slate-100 group-hover:bg-subway-green group-hover:text-white text-slate-600 font-extrabold text-xs flex items-center justify-center">${idx + 1}</span>
-                                <span>${opt}</span>
-                            </span>
-                        `;
-                        grid.appendChild(btn);
-                    });
-                    bodyContainer.appendChild(grid);
-
-                } else if (q.type === 'short') {
-                    const wrapper = document.createElement('div');
-                    wrapper.className = 'space-y-3';
-                    wrapper.innerHTML = `
-                        <input type="text" id="short-answer-input" placeholder="예: 페퍼로니 3장, 살라미 3장, 햄 2장" class="w-full p-4 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-subway-green focus:outline-none font-medium">
-                        <p class="text-xs text-slate-400">* 정확한 재료 명칭과 수량을 입력하세요.</p>
-                    `;
-                    bodyContainer.appendChild(wrapper);
-
-                } else if (q.type === 'fill') {
-                    const fillBox = document.createElement('div');
-                    fillBox.className = 'space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-200';
-                    q.blanks.forEach(b => {
-                        const row = document.createElement('div');
-                        row.className = 'flex items-center gap-3 text-sm font-bold text-slate-700';
-                        row.innerHTML = `
-                            <span class="w-24">${b.label}:</span>
-                            <input type="text" data-key="${b.key}" data-ans="${b.ans}" class="fill-blank-input p-2.5 border border-slate-300 rounded-lg text-center font-black w-24 focus:ring-2 focus:ring-subway-green focus:outline-none bg-white">
-                            <span>개/장/스쿱</span>
-                        `;
-                        fillBox.appendChild(row);
-                    });
-                    bodyContainer.appendChild(fillBox);
-
-                } else if (q.type === 'ox') {
-                    const grid = document.createElement('div');
-                    grid.className = 'grid grid-cols-2 gap-4';
-                    ['O', 'X'].forEach(val => {
-                        const btn = document.createElement('button');
-                        btn.type = 'button';
-                        btn.className = `quiz-option-btn p-8 rounded-2xl border-2 border-slate-200 hover:border-subway-green text-3xl font-black transition text-center ${val === 'O' ? 'hover:bg-emerald-50 text-emerald-600' : 'hover:bg-rose-50 text-rose-600'}`;
-                        btn.onclick = () => this.selectOption(btn);
-                        btn.dataset.value = val;
-                        btn.innerText = val;
-                        grid.appendChild(btn);
-                    });
-                    bodyContainer.appendChild(grid);
-
-                } else if (q.type === 'veg') {
-                    const vegContainer = document.createElement('div');
-                    vegContainer.className = 'space-y-4';
-                    vegContainer.innerHTML = `
-                        <!-- Selected Slots -->
-                        <div id="veg-slots" class="grid grid-cols-4 gap-2 bg-slate-100 p-3 rounded-xl border border-slate-200 min-h-[90px]">
-                            <!-- Slots 1 to 8 -->
-                        </div>
-
-                        <!-- Available Options -->
-                        <div class="space-y-1">
-                            <span class="text-xs text-slate-500 font-bold">아래 야채를 터치하여 순서대로 넣으세요:</span>
-                            <div id="veg-options" class="flex flex-wrap gap-2 pt-1">
-                                <!-- Options dynamically rendered -->
-                            </div>
-                        </div>
-                    `;
-                    bodyContainer.appendChild(vegContainer);
-                    this.renderVegInteractive(q);
-                }
-
-                this.initIcons();
-            }
-
-            selectOption(btnEl) {
-                const all = document.querySelectorAll('.quiz-option-btn');
-                all.forEach(b => b.classList.remove('ring-2', 'ring-subway-green', 'bg-subway-lightgreen', 'border-subway-green'));
-                btnEl.classList.add('ring-2', 'ring-subway-green', 'bg-subway-lightgreen', 'border-subway-green');
-                btnEl.dataset.selected = "true";
-            }
-
-            renderVegInteractive(q) {
-                const slotsEl = document.getElementById('veg-slots');
-                const optionsEl = document.getElementById('veg-options');
-
-                this.vegSelected = [];
-
-                const updateVegUI = () => {
-                    slotsEl.innerHTML = '';
-                    for (let i = 0; i < 8; i++) {
-                        const val = this.vegSelected[i];
-                        const slot = document.createElement('div');
-                        slot.className = `p-2 rounded-lg text-center text-xs font-extrabold border flex flex-col items-center justify-center ${val ? 'bg-subway-green text-white border-subway-darkgreen' : 'bg-white text-slate-300 border-dashed border-slate-300'}`;
-                        slot.innerHTML = `
-                            <span class="text-[9px] opacity-70">${i + 1}번</span>
-                            <span class="truncate w-full">${val || '빈칸'}</span>
-                        `;
-                        if (val) {
-                            slot.onclick = () => {
-                                this.vegSelected.splice(i, 1);
-                                updateVegUI();
-                            };
-                        }
-                        slotsEl.appendChild(slot);
-                    }
-
-                    optionsEl.innerHTML = '';
-                    q.shuffledVeg.forEach(vegName => {
-                        if (!this.vegSelected.includes(vegName)) {
-                            const optBtn = document.createElement('button');
-                            optBtn.type = 'button';
-                            optBtn.className = 'bg-white border border-slate-300 hover:border-subway-green text-slate-800 text-xs font-bold px-3 py-2 rounded-lg shadow-sm transition active:scale-95';
-                            optBtn.innerText = vegName;
-                            optBtn.onclick = () => {
-                                if (this.vegSelected.length < 8) {
-                                    this.vegSelected.push(vegName);
-                                    updateVegUI();
-                                }
-                            };
-                            optionsEl.appendChild(optBtn);
-                        }
-                    });
-                };
-
-                updateVegUI();
-            }
-
-            startSpeedTimer(seconds) {
-                clearInterval(this.speedTimer);
-                let remaining = seconds;
-                const timerText = document.getElementById('quiz-timer-text');
-
-                this.speedTimer = setInterval(() => {
-                    remaining -= 0.1;
-                    if (remaining <= 0) {
-                        clearInterval(this.speedTimer);
-                        timerText.innerText = "00.0s";
-                        this.submitAnswer(true); // timeout forced submit
+        /* ==========================================================================
+           2. STATE MANAGEMENT & LOCAL STORAGE
+           ========================================================================== */
+        let state = {
+            view: 'dashboard',
+            notes: JSON.parse(localStorage.getItem('subway_quiz_notes') || '[]'),
+            stats: JSON.parse(localStorage.getItem('subway_quiz_stats') || '{"solved":0,"correct":0,"menuStats":{}}'),
+            
+            // Quiz Setting
+            settingCount: 10,
+            settingRange: 'all',
+            settingType: 'all',
+            settingDiff: 'intermediate',
+            
+            // Current Quiz Session
+            quizList: [],
+            currentIndex: 0,
+            userAnswers: [],
+            sessionScore: 0,
+            sessionStartTime: null,
+            timerInterval: null,
+
+            // Interactive state for drag/touch veggie
+            veggieUserSequence: []
+        };
+
+        /* Save & Load Helpers */
+        function saveStats() {
+            localStorage.setItem('subway_quiz_stats', JSON.stringify(state.stats));
+        }
+        function saveNotes() {
+            localStorage.setItem('subway_quiz_notes', JSON.stringify(state.notes));
+            updateNotesBadge();
+        }
+
+        /* ==========================================================================
+           3. UI CONTROLLER & VIEW SWITCHER
+           ========================================================================== */
+        function showView(viewName) {
+            state.view = viewName;
+            document.querySelectorAll('main > section').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`view-${viewName}`).classList.remove('hidden');
+
+            // Header Active Style
+            ['dashboard', 'guide', 'notes'].forEach(nav => {
+                const btn = document.getElementById(`nav-${nav}`);
+                if (btn) {
+                    if (nav === viewName) {
+                        btn.className = "px-2.5 py-1.5 rounded-lg bg-white/20 text-white font-extrabold flex items-center space-x-1";
                     } else {
-                        timerText.innerText = `${remaining.toFixed(1)}s`;
+                        btn.className = "px-2.5 py-1.5 rounded-lg hover:bg-white/10 transition flex items-center space-x-1";
                     }
-                }, 100);
-            }
-
-            /**
-             * ANSWER SUBMISSION & FEEDBACK EVALUATION
-             */
-            submitAnswer(isTimeout = false) {
-                if (this.speedTimer) clearInterval(this.speedTimer);
-
-                const q = this.session.questions[this.session.currentIndex];
-                const timeTakenSec = ((Date.now() - this.session.questionStartTime) / 1000).toFixed(1);
-
-                let isCorrect = false;
-                let userAnswerStr = '';
-
-                if (isTimeout) {
-                    userAnswerStr = '시간 초과';
-                    isCorrect = false;
-                } else if (q.type === 'choice' || q.type === 'ox' || q.type === 'error' || q.type === 'scenario') {
-                    const selectedBtn = document.querySelector('.quiz-option-btn[data-selected="true"]');
-                    if (!selectedBtn) {
-                        alert('답안을 선택해 주세요!');
-                        return;
-                    }
-                    userAnswerStr = selectedBtn.dataset.value;
-                    isCorrect = (userAnswerStr.trim() === q.correctAnswer.trim());
-
-                } else if (q.type === 'short') {
-                    const input = document.getElementById('short-answer-input');
-                    userAnswerStr = input.value.trim();
-                    if (!userAnswerStr) {
-                        alert('정답을 입력해 주세요!');
-                        return;
-                    }
-                    // Flexible matching (remove spaces, match key counts)
-                    const normalizedUser = userAnswerStr.replace(/\s+/g, '');
-                    const normalizedAns = q.correctAnswer.replace(/\s+/g, '');
-                    isCorrect = (normalizedUser.includes(normalizedAns) || normalizedAns.includes(normalizedUser));
-
-                } else if (q.type === 'fill') {
-                    const inputs = document.querySelectorAll('.fill-blank-input');
-                    let allRight = true;
-                    const answersArr = [];
-                    inputs.forEach(inp => {
-                        const val = inp.value.trim();
-                        answersArr.push(val);
-                        if (val !== inp.dataset.ans) {
-                            allRight = false;
-                        }
-                    });
-                    userAnswerStr = answersArr.join(', ');
-                    isCorrect = allRight;
-
-                } else if (q.type === 'veg') {
-                    if (this.vegSelected.length < 8) {
-                        alert('8가지 야채 순서를 모두 선택해 주세요!');
-                        return;
-                    }
-                    userAnswerStr = this.vegSelected.join(' → ');
-                    isCorrect = (userAnswerStr === q.correctOrder.join(' → '));
                 }
+            });
 
-                // Record stats
-                this.stats.totalSolved++;
-                this.stats.totalTimeSec += parseFloat(timeTakenSec);
+            if (viewName === 'dashboard') updateDashboardStats();
+            if (viewName === 'guide') renderGuideTable();
+            if (viewName === 'notes') renderNotesList();
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
 
-                if (q.recipe && q.recipe.id) {
-                    if (!this.stats.menuAccuracy[q.recipe.id]) {
-                        this.stats.menuAccuracy[q.recipe.id] = { asked: 0, correct: 0 };
-                    }
-                    this.stats.menuAccuracy[q.recipe.id].asked++;
-                    if (isCorrect) this.stats.menuAccuracy[q.recipe.id].correct++;
-                }
-
-                if (isCorrect) {
-                    this.session.correctCount++;
-                    this.stats.correctCount++;
+        function setCount(count) {
+            state.settingCount = count;
+            document.querySelectorAll('.btn-count').forEach(btn => {
+                const c = parseInt(btn.dataset.count);
+                if (c === count) {
+                    btn.className = "btn-count py-2.5 rounded-xl border border-subway-green font-bold bg-subway-green text-white";
                 } else {
-                    // Add to wrong notes
-                    if (q.recipe && q.recipe.id && !this.wrongNotes.includes(q.recipe.id)) {
-                        this.wrongNotes.push(q.recipe.id);
-                        this.saveWrongNotes();
-                    }
+                    btn.className = "btn-count py-2.5 rounded-xl border border-slate-200 font-bold bg-slate-50 text-slate-700";
                 }
+            });
+        }
 
-                this.saveStats();
-                this.updateUIStats();
-
-                // Save to session results
-                this.session.results.push({
-                    question: q.title,
-                    userAnswer: userAnswerStr,
-                    correctAnswer: q.correctAnswer || (q.correctOrder ? q.correctOrder.join(' → ') : '참조 데이터'),
-                    isCorrect,
-                    timeTakenSec,
-                    recipeName: q.recipe ? q.recipe.name : '야채 순서'
-                });
-
-                // Display Instant Feedback Box
-                this.showFeedbackBox(isCorrect, q, userAnswerStr, timeTakenSec);
-            }
-
-            showFeedbackBox(isCorrect, q, userAnswerStr, timeTakenSec) {
-                const actionBtn = document.getElementById('btn-submit-answer');
-                actionBtn.classList.add('hidden');
-
-                const fbBox = document.getElementById('feedback-box');
-                const fbTitle = document.getElementById('feedback-title');
-                const fbDetail = document.getElementById('feedback-detail');
-                const fbTime = document.getElementById('feedback-time-taken');
-                const fbTipText = document.getElementById('feedback-tip-text');
-
-                fbBox.classList.remove('hidden');
-                fbTime.innerText = `${timeTakenSec}초 소요`;
-
-                if (isCorrect) {
-                    fbBox.className = "bg-emerald-50 rounded-2xl border-2 border-emerald-400 p-6 shadow-lg space-y-4";
-                    fbTitle.innerHTML = `
-                        <i data-lucide="check-circle" class="w-6 h-6 text-emerald-600"></i>
-                        <span class="text-emerald-800">정답입니다! 완벽해요!</span>
-                    `;
-                } else {
-                    fbBox.className = "bg-rose-50 rounded-2xl border-2 border-rose-400 p-6 shadow-lg space-y-4";
-                    fbTitle.innerHTML = `
-                        <i data-lucide="x-circle" class="w-6 h-6 text-rose-600"></i>
-                        <span class="text-rose-800">아쉽습니다! 오답입니다.</span>
-                    `;
-                }
-
-                let correctValStr = q.correctAnswer;
-                if (q.type === 'veg') correctValStr = q.correctOrder.join(' → ');
-                if (q.type === 'fill') correctValStr = q.blanks.map(b => `${b.label}: ${b.ans}`).join(', ');
-
-                fbDetail.innerHTML = `
-                    <div><strong class="text-slate-900">제출한 답변:</strong> <span class="${isCorrect ? 'text-emerald-700 font-bold' : 'text-rose-700 font-bold'}">${userAnswerStr}</span></div>
-                    <div><strong class="text-slate-900">공식 정답:</strong> <span class="text-subway-darkgreen font-extrabold">${correctValStr}</span></div>
-                    ${q.recipe && q.recipe.ingredients ? `<div class="pt-1 border-t border-slate-200 mt-2"><strong class="text-slate-900">${q.recipe.name} 전체 레시피:</strong> ${q.recipe.ingredients}</div>` : ''}
-                `;
-
-                fbTipText.innerText = q.tip || '매장에서 반복 연습하여 손에 익히세요!';
-
-                this.initIcons();
-            }
-
-            nextQuestion() {
-                this.session.currentIndex++;
-                if (this.session.currentIndex < this.session.questions.length) {
-                    this.loadQuestion();
-                } else {
-                    this.finishQuizSession();
-                }
-            }
-
-            confirmExitQuiz() {
-                if (confirm('진행 중인 퀴즈를 종료하고 홈으로 나가시겠습니까?')) {
-                    if (this.speedTimer) clearInterval(this.speedTimer);
-                    this.showPage('dashboard');
-                }
-            }
-
-            finishQuizSession() {
-                if (this.speedTimer) clearInterval(this.speedTimer);
-
-                const total = this.session.results.length;
-                const correct = this.session.correctCount;
-                const percent = Math.round((correct / total) * 100);
-
-                let totalTime = 0;
-                this.session.results.forEach(r => totalTime += parseFloat(r.timeTakenSec));
-                const avgSpeed = (totalTime / total).toFixed(1);
-
-                document.getElementById('result-score-percent').innerText = `${percent}%`;
-                document.getElementById('result-correct-count').innerText = `${correct} / ${total}`;
-                document.getElementById('result-avg-speed').innerText = `${avgSpeed}초`;
-
-                // Evaluation text
-                const evalTitle = document.getElementById('result-eval-title');
-                const evalDesc = document.getElementById('result-eval-desc');
-
-                if (percent === 100) {
-                    evalTitle.innerText = "🏆 완벽 그 자체! 마스터 알바생 인정!";
-                    evalDesc.innerText = "모든 레시피와 순서를 완벽히 암기하였습니다. 매장 즉시 투입 가능!";
-                } else if (percent >= 80) {
-                    evalTitle.innerText = "🌟 훌륭함! 고득점 달성!";
-                    evalDesc.innerText = "대부분의 주요 레시피를 잘 기억하고 있습니다. 틀린 부분만 살짝 복습해 보세요.";
-                } else {
-                    evalTitle.innerText = "📖 복습이 조금 더 필요해요!";
-                    evalDesc.innerText = "오답 노트를 통해 헷갈리는 재료 수량과 썹픽 소스를 다시 한번 확인하세요.";
-                }
-
-                // Render breakdown list
-                const breakdownList = document.getElementById('result-breakdown-list');
-                breakdownList.innerHTML = '';
-
-                this.session.results.forEach((r, idx) => {
-                    const row = document.createElement('div');
-                    row.className = `p-3 rounded-xl border text-xs flex items-center justify-between ${r.isCorrect ? 'bg-emerald-50/60 border-emerald-200 text-slate-800' : 'bg-rose-50/60 border-rose-200 text-slate-800'}`;
-                    row.innerHTML = `
-                        <div class="space-y-0.5">
-                            <span class="font-bold block">${idx + 1}. [${r.recipeName}] ${r.question}</span>
-                            <span class="text-slate-500">제출: ${r.userAnswer} ${!r.isCorrect ? `(정답: ${r.correctAnswer})` : ''}</span>
-                        </div>
-                        <div class="flex items-center gap-2 flex-shrink-0">
-                            <span class="font-mono text-[10px] text-slate-400">${r.timeTakenSec}s</span>
-                            ${r.isCorrect ? '<span class="bg-emerald-600 text-white font-bold px-2 py-0.5 rounded text-[10px]">정답</span>' : '<span class="bg-rose-600 text-white font-bold px-2 py-0.5 rounded text-[10px]">오답</span>'}
-                        </div>
-                    `;
-                    breakdownList.appendChild(row);
-                });
-
-                this.showPage('result');
-            }
-
-            restartQuiz() {
-                if (this.session && this.session.config) {
-                    this.initQuizSession(this.session.config);
-                } else {
-                    this.startQuickQuiz();
-                }
+        function updateNotesBadge() {
+            const badge = document.getElementById('nav-note-count');
+            const btnQuiz = document.getElementById('btn-notes-quiz');
+            const count = state.notes.length;
+            if (count > 0) {
+                badge.innerText = count;
+                badge.classList.remove('hidden');
+                if (btnQuiz) btnQuiz.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+                if (btnQuiz) btnQuiz.classList.add('hidden');
             }
         }
 
-        // Initialize App Globally
-        let app;
-        window.onload = function() {
-            app = new SubwayQuizApp();
-        };
+        function updateDashboardStats() {
+            document.getElementById('stat-total-solved').innerText = state.stats.solved;
+            const accuracy = state.stats.solved > 0 ? Math.round((state.stats.correct / state.stats.solved) * 100) : 0;
+            document.getElementById('stat-accuracy').innerText = `${accuracy}%`;
+            document.getElementById('stat-notes-count').innerText = state.notes.length;
+
+            // Weakest Menu Calculation
+            let weakestMenu = "없음";
+            let lowestRate = 101;
+            Object.keys(state.stats.menuStats || {}).forEach(mId => {
+                const ms = state.stats.menuStats[mId];
+                if (ms.total >= 2) {
+                    const rate = (ms.correct / ms.total) * 100;
+                    if (rate < lowestRate) {
+                        lowestRate = rate;
+                        const mObj = SUBWAY_DATA.find(d => d.id == mId);
+                        if (mObj) weakestMenu = mObj.name;
+                    }
+                }
+            });
+            document.getElementById('stat-weak-menu').innerText = weakestMenu;
+            updateNotesBadge();
+        }
+
+        /* ==========================================================================
+           4. QUIZ GENERATOR ENGINE (10가지 다양한 퀴즈 지원)
+           ========================================================================== */
+        function generateQuizSet(customSource = null) {
+            let pool = customSource ? [...customSource] : [...SUBWAY_DATA];
+            let questions = [];
+
+            const reqCount = state.settingCount === 999 ? 50 : state.settingCount;
+            const range = state.settingRange;
+            const chosenType = state.settingType;
+
+            // Helper to pick random item from array
+            const randItem = (arr) => arr[Math.floor(Math.random() * arr.length)];
+            const shuffle = (arr) => [...arr].sort(() => Math.random() - 0.5);
+
+            for (let i = 0; i < reqCount; i++) {
+                const targetMenu = randItem(pool);
+                let qType = chosenType;
+
+                if (chosenType === 'all') {
+                    if (range === 'veggie') {
+                        qType = 'veggie_order';
+                    } else if (range === 'subpick') {
+                        qType = randItem(['mc', 'short', 'order_roleplay']);
+                    } else {
+                        qType = randItem(['mc', 'short', 'fill', 'ox', 'rev_mc', 'spot_wrong', 'order_roleplay', 'veggie_order']);
+                    }
+                }
+
+                // Question Generators
+                let qObj = null;
+
+                switch (qType) {
+                    case 'veggie_order':
+                        qObj = {
+                            type: 'veggie_order',
+                            menuTag: '공식 야채 빌드 순서',
+                            question: '샌드위치 제조 시 야채 8종을 올려놓는 올바른 순서대로 클릭하세요.',
+                            subtext: '양상추부터 시작하여 마지막 할라피뇨까지 8개 순서를 맞추세요.',
+                            correctSeq: [...VEGGIE_ORDER],
+                            cheatTip: "암기 공식: 양상추➔토마토➔오이➔피클➔피망➔양파➔올리브➔할라피뇨"
+                        };
+                        break;
+
+                    case 'ox':
+                        const isTrue = Math.random() > 0.5;
+                        if (isTrue) {
+                            qObj = {
+                                type: 'ox',
+                                menuTag: `${targetMenu.name}`,
+                                question: `[OX 퀴즈] "${targetMenu.name}"의 메인 재료 및 수량은 "${targetMenu.main}" 이다.`,
+                                answer: 'O',
+                                fullRecipe: targetMenu,
+                                cheatTip: targetMenu.tip
+                            };
+                        } else {
+                            const wrongTarget = randItem(SUBWAY_DATA.filter(d => d.id !== targetMenu.id));
+                            qObj = {
+                                type: 'ox',
+                                menuTag: `${targetMenu.name}`,
+                                question: `[OX 퀴즈] "${targetMenu.name}"의 메인 재료 및 수량은 "${wrongTarget.main}" 이다.`,
+                                answer: 'X',
+                                fullRecipe: targetMenu,
+                                cheatTip: `올바른 재료: ${targetMenu.main} (${targetMenu.tip})`
+                            };
+                        }
+                        break;
+
+                    case 'fill':
+                        // Fill in the blank (Numbers/Quantities)
+                        qObj = {
+                            type: 'short',
+                            menuTag: `${targetMenu.name}`,
+                            question: `[빈칸 채우기] "${targetMenu.name}"의 메인 속재료 수량을 작성하세요.\n(${targetMenu.tip})`,
+                            subtext: '정확한 재료명과 수량을 띄어쓰기하여 입력하세요.',
+                            answer: targetMenu.main,
+                            fullRecipe: targetMenu,
+                            cheatTip: targetMenu.tip
+                        };
+                        break;
+
+                    case 'rev_mc':
+                        // Show ingredients -> match menu
+                        const wrongMenus = shuffle(SUBWAY_DATA.filter(d => d.id !== targetMenu.id)).slice(0, 3);
+                        const options = shuffle([targetMenu, ...wrongMenus]);
+                        qObj = {
+                            type: 'mc',
+                            menuTag: '재료보고 메뉴 맞히기',
+                            question: `다음 메인 속재료 [ ${targetMenu.main} ] 이(가) 들어가는 샌드위치 메뉴는?`,
+                            options: options.map(o => o.name),
+                            answer: targetMenu.name,
+                            fullRecipe: targetMenu,
+                            cheatTip: targetMenu.tip
+                        };
+                        break;
+
+                    case 'order_roleplay':
+                        // Customer Roleplay
+                        qObj = {
+                            type: 'mc',
+                            menuTag: '실전 주문 훈련',
+                            question: `손님: "${targetMenu.name} 썹픽(Sub Pick) 하나 주세요!"\n이 메뉴의 고정 [ 빵 + 치즈 ] 조합은?`,
+                            options: shuffle([
+                                `${targetMenu.bread} + ${targetMenu.cheese}`,
+                                `${randItem(SUBWAY_DATA).bread} + ${targetMenu.cheese}`,
+                                `${targetMenu.bread} + ${randItem(SUBWAY_DATA).cheese}`,
+                                `플랫 브레드 + 모차렐라 치즈`
+                            ]),
+                            answer: `${targetMenu.bread} + ${targetMenu.cheese}`,
+                            fullRecipe: targetMenu,
+                            cheatTip: `썹픽 고정 빵: ${targetMenu.bread} / 치즈: ${targetMenu.cheese} / 소스: ${targetMenu.sauce}`
+                        };
+                        break;
+
+                    case 'short':
+                        qObj = {
+                            type: 'short',
+                            menuTag: `${targetMenu.name}`,
+                            question: `"${targetMenu.name}"의 공식 메인 속재료 수량을 정확하게 적어주세요.`,
+                            subtext: '예: 페퍼로니 3장 + 살라미 3장 + 햄 2장',
+                            answer: targetMenu.main,
+                            fullRecipe: targetMenu,
+                            cheatTip: targetMenu.tip
+                        };
+                        break;
+
+                    case 'mc':
+                    default:
+                        // Standard MC
+                        const wrongMains = shuffle(SUBWAY_DATA.filter(d => d.id !== targetMenu.id)).slice(0, 3).map(d => d.main);
+                        const mcOptions = shuffle([targetMenu.main, ...wrongMains]);
+                        qObj = {
+                            type: 'mc',
+                            menuTag: `${targetMenu.name}`,
+                            question: `"${targetMenu.name}"에 들어가는 메인 속재료 및 정확한 수량은?`,
+                            options: mcOptions,
+                            answer: targetMenu.main,
+                            fullRecipe: targetMenu,
+                            cheatTip: targetMenu.tip
+                        };
+                        break;
+                }
+
+                questions.push(qObj);
+            }
+
+            return questions;
+        }
+
+        /* ==========================================================================
+           5. QUIZ RUNNER & INTERACTION ENGINE
+           ========================================================================== */
+        function startQuickQuiz() {
+            setCount(10);
+            state.settingRange = 'all';
+            state.settingType = 'all';
+            startCustomQuiz();
+        }
+
+        function startNotesQuiz() {
+            if (state.notes.length === 0) {
+                alert('저장된 오답이 없습니다!');
+                return;
+            }
+            state.quizList = shuffle([...state.notes]);
+            initQuizSession();
+        }
+
+        function startCustomQuiz() {
+            state.quizList = generateQuizSet();
+            initQuizSession();
+        }
+
+        function initQuizSession() {
+            state.currentIndex = 0;
+            state.userAnswers = [];
+            state.sessionScore = 0;
+            state.sessionStartTime = Date.now();
+            showView('quiz');
+            renderCurrentQuestion();
+        }
+
+        function renderCurrentQuestion() {
+            const q = state.quizList[state.currentIndex];
+            const total = state.quizList.length;
+
+            // UI Elements Update
+            document.getElementById('quiz-progress-text').innerText = `${String(state.currentIndex + 1).padStart(2, '0')} / ${String(total).padStart(2, '0')}`;
+            document.getElementById('quiz-progress-bar').style.width = `${((state.currentIndex + 1) / total) * 100}%`;
+            document.getElementById('quiz-menu-tag').innerText = q.menuTag || '레시피 퀴즈';
+            document.getElementById('quiz-question-text').innerText = q.question;
+            document.getElementById('quiz-subtext').innerText = q.subtext || '정답을 고르거나 직접 입력하세요.';
+
+            // Reset Feedback Panel
+            const fb = document.getElementById('quiz-feedback');
+            fb.classList.add('hidden');
+            fb.className = "hidden rounded-xl p-4 text-xs sm:text-sm font-medium border space-y-2";
+
+            // Action Button
+            const btnAction = document.getElementById('btn-quiz-action');
+            btnAction.innerText = "정답 제출하기";
+            btnAction.onclick = submitAnswer;
+
+            // Render Answer Area based on type
+            const area = document.getElementById('quiz-answer-area');
+            area.innerHTML = '';
+
+            if (q.type === 'mc') {
+                const grid = document.createElement('div');
+                grid.className = 'grid grid-cols-1 gap-2.5';
+                q.options.forEach((opt, idx) => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'quiz-opt-btn w-full text-left p-3.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-emerald-50 hover:border-emerald-300 font-bold text-xs sm:text-sm text-slate-800 transition flex items-center justify-between';
+                    btn.innerHTML = `<span>${opt}</span> <i class="fa-regular fa-circle text-slate-300"></i>`;
+                    btn.onclick = () => {
+                        document.querySelectorAll('.quiz-opt-btn').forEach(b => {
+                            b.className = 'quiz-opt-btn w-full text-left p-3.5 rounded-xl border border-slate-200 bg-slate-50 font-bold text-xs sm:text-sm text-slate-800 transition flex items-center justify-between';
+                            b.querySelector('i').className = 'fa-regular fa-circle text-slate-300';
+                        });
+                        btn.className = 'quiz-opt-btn w-full text-left p-3.5 rounded-xl border-2 border-subway-green bg-emerald-50 font-extrabold text-xs sm:text-sm text-subway-darkgreen shadow-2xs flex items-center justify-between';
+                        btn.querySelector('i').className = 'fa-solid fa-circle-check text-subway-green';
+                        btn.dataset.selected = "true";
+                    };
+                    btn.dataset.val = opt;
+                    grid.appendChild(btn);
+                });
+                area.appendChild(grid);
+            } else if (q.type === 'ox') {
+                const grid = document.createElement('div');
+                grid.className = 'grid grid-cols-2 gap-4 max-w-sm mx-auto';
+                ['O', 'X'].forEach(val => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'quiz-ox-btn p-6 rounded-2xl border-2 border-slate-200 bg-slate-50 hover:bg-emerald-50 font-black text-3xl sm:text-4xl text-slate-700 transition text-center';
+                    btn.innerText = val;
+                    btn.onclick = () => {
+                        document.querySelectorAll('.quiz-ox-btn').forEach(b => {
+                            b.className = 'quiz-ox-btn p-6 rounded-2xl border-2 border-slate-200 bg-slate-50 font-black text-3xl sm:text-4xl text-slate-700 transition text-center';
+                        });
+                        btn.className = 'quiz-ox-btn p-6 rounded-2xl border-2 border-subway-green bg-emerald-50 font-black text-3xl sm:text-4xl text-subway-darkgreen shadow-sm text-center';
+                        btn.dataset.selected = "true";
+                    };
+                    btn.dataset.val = val;
+                    grid.appendChild(btn);
+                });
+                area.appendChild(grid);
+            } else if (q.type === 'short') {
+                area.innerHTML = `
+                    <div class="space-y-2">
+                        <input type="text" id="input-short-answer" placeholder="정확한 재료명과 수량 입력..." class="w-full p-4 border border-slate-200 rounded-xl bg-slate-50 font-bold text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-subway-green">
+                        <p class="text-[11px] text-slate-400 font-medium">* 띄어쓰기나 부호 차이는 자동으로 유연하게 검증됩니다.</p>
+                    </div>
+                `;
+            } else if (q.type === 'veggie_order') {
+                state.veggieUserSequence = [];
+                const shuffledVegs = shuffle([...VEGGIE_ORDER]);
+
+                const wrap = document.createElement('div');
+                wrap.className = 'space-y-4';
+                wrap.innerHTML = `
+                    <div class="bg-slate-100 p-3 rounded-xl border border-slate-200 min-h-[52px] flex flex-wrap gap-1.5 items-center" id="veggie-selected-box">
+                        <span class="text-xs text-slate-400 font-bold">순서대로 버튼을 누르세요 ➔</span>
+                    </div>
+                    <div class="grid grid-cols-4 gap-2" id="veggie-buttons-box">
+                        ${shuffledVegs.map(v => `
+                            <button type="button" onclick="clickVeggieItem(this, '${v}')" class="veggie-badge p-2.5 rounded-lg border border-slate-200 bg-white hover:bg-emerald-50 font-bold text-xs text-slate-800 shadow-2xs">
+                                ${v}
+                            </button>
+                        `).join('')}
+                    </div>
+                    <button type="button" onclick="resetVeggieSequence()" class="text-xs font-bold text-rose-500 hover:underline">
+                        <i class="fa-solid fa-rotate-left"></i> 순서 다시 고르기
+                    </button>
+                `;
+                area.appendChild(wrap);
+            }
+        }
+
+        /* Veggie Order Click Handler */
+        function clickVeggieItem(btn, name) {
+            if (state.veggieUserSequence.includes(name)) return;
+            state.veggieUserSequence.push(name);
+            btn.classList.add('opacity-30', 'pointer-events-none');
+
+            const box = document.getElementById('veggie-selected-box');
+            if (state.veggieUserSequence.length === 1) box.innerHTML = '';
+
+            const badge = document.createElement('span');
+            badge.className = 'bg-subway-green text-white text-xs font-bold px-2.5 py-1 rounded-md shadow-2xs flex items-center space-x-1';
+            badge.innerText = `${state.veggieUserSequence.length}. ${name}`;
+            box.appendChild(badge);
+        }
+
+        function resetVeggieSequence() {
+            state.veggieUserSequence = [];
+            const q = state.quizList[state.currentIndex];
+            renderCurrentQuestion();
+        }
+
+        /* Submit and Grade Answer */
+        function submitAnswer() {
+            const q = state.quizList[state.currentIndex];
+            let userAns = "";
+            let isCorrect = false;
+
+            if (q.type === 'mc') {
+                const sel = document.querySelector('.quiz-opt-btn[data-selected="true"]');
+                if (!sel) { alert('답안을 선택해주세요!'); return; }
+                userAns = sel.dataset.val;
+                isCorrect = (userAns === q.answer);
+            } else if (q.type === 'ox') {
+                const sel = document.querySelector('.quiz-ox-btn[data-selected="true"]');
+                if (!sel) { alert('O 또는 X를 선택해주세요!'); return; }
+                userAns = sel.dataset.val;
+                isCorrect = (userAns === q.answer);
+            } else if (q.type === 'short') {
+                const input = document.getElementById('input-short-answer');
+                if (!input || !input.value.trim()) { alert('답을 입력해주세요!'); return; }
+                userAns = input.value.trim();
+
+                // Flexible Normalization Matching
+                const norm = (str) => str.replace(/[\s\(\)\,\.\+\-]/g, '').toLowerCase();
+                isCorrect = norm(userAns) === norm(q.answer);
+            } else if (q.type === 'veggie_order') {
+                if (state.veggieUserSequence.length < 8) {
+                    alert('8가지 야채를 모두 순서대로 선택해주세요!');
+                    return;
+                }
+                userAns = state.veggieUserSequence.join(' -> ');
+                isCorrect = JSON.stringify(state.veggieUserSequence) === JSON.stringify(q.correctSeq);
+            }
+
+            // Record State
+            if (isCorrect) state.sessionScore += 1;
+            state.userAnswers.push({ question: q, userAns, isCorrect });
+
+            // Global Statistics
+            state.stats.solved += 1;
+            if (isCorrect) state.stats.correct += 1;
+            if (q.fullRecipe) {
+                const mId = q.fullRecipe.id;
+                state.stats.menuStats[mId] = state.stats.menuStats[mId] || { total: 0, correct: 0 };
+                state.stats.menuStats[mId].total += 1;
+                if (isCorrect) state.stats.menuStats[mId].correct += 1;
+            }
+            saveStats();
+
+            // Handle Incorrect Notes
+            if (!isCorrect && q.fullRecipe) {
+                if (!state.notes.some(n => n.question === q.question)) {
+                    state.notes.push(q);
+                    saveNotes();
+                }
+            }
+
+            // Display Feedback Panel
+            const fb = document.getElementById('quiz-feedback');
+            const statusBox = document.getElementById('feedback-status');
+            const detailBox = document.getElementById('feedback-detail');
+            const cheatBox = document.getElementById('feedback-cheat-text');
+
+            fb.classList.remove('hidden');
+
+            if (isCorrect) {
+                fb.className = "rounded-xl p-4 text-xs sm:text-sm font-medium border space-y-2 bg-emerald-50 border-emerald-200 text-emerald-900";
+                statusBox.innerHTML = `<i class="fa-solid fa-circle-check text-subway-green text-lg"></i> <span>정답입니다! 완벽해요!</span>`;
+            } else {
+                fb.className = "rounded-xl p-4 text-xs sm:text-sm font-medium border space-y-2 bg-rose-50 border-rose-200 text-rose-900";
+                statusBox.innerHTML = `<i class="fa-solid fa-circle-xmark text-rose-500 text-lg"></i> <span>아쉽네요. 다시 확인해보세요!</span>`;
+            }
+
+            if (q.type === 'veggie_order') {
+                detailBox.innerHTML = `<strong>공식 야채 빌드 순서:</strong><br>${VEGGIE_ORDER.join(' ➔ ')}`;
+            } else {
+                detailBox.innerHTML = `<strong>정답:</strong> ${q.answer}<br>${q.fullRecipe ? `<strong>[${q.fullRecipe.name} 풀 레시피]</strong> 메인: ${q.fullRecipe.main} | 썹픽: ${q.fullRecipe.bread}, ${q.fullRecipe.cheese}, ${q.fullRecipe.sauce}` : ''}`;
+            }
+
+            cheatBox.innerText = q.cheatTip || "공식 레시피 수량을 머릿속으로 그려보세요!";
+
+            // Update Action Button to Next
+            const btnAction = document.getElementById('btn-quiz-action');
+            btnAction.innerText = (state.currentIndex < state.quizList.length - 1) ? "다음 문제로 ➔" : "결과 확인하기";
+            btnAction.onclick = nextQuestion;
+        }
+
+        function nextQuestion() {
+            state.currentIndex += 1;
+            if (state.currentIndex < state.quizList.length) {
+                renderCurrentQuestion();
+            } else {
+                finishQuizSession();
+            }
+        }
+
+        function finishQuizSession() {
+            showView('result');
+            const total = state.quizList.length;
+            const correct = state.sessionScore;
+            const wrong = total - correct;
+            const scorePct = Math.round((correct / total) * 100);
+
+            document.getElementById('result-score').innerHTML = `${scorePct} <span class="text-lg text-slate-400">/ 100</span>`;
+            document.getElementById('result-correct').innerText = `${correct}개`;
+            document.getElementById('result-wrong').innerText = `${wrong}개`;
+
+            const durationSec = Math.floor((Date.now() - state.sessionStartTime) / 1000);
+            const mins = String(Math.floor(durationSec / 60)).padStart(2, '0');
+            const secs = String(durationSec % 60).padStart(2, '0');
+            document.getElementById('result-time').innerText = `${mins}:${secs}`;
+            document.getElementById('result-saved-notes').innerText = `${wrong}건`;
+
+            let comment = "수고하셨습니다! 계속해서 3·3·2 공식과 썹픽 레시피를 반복하세요.";
+            if (scorePct === 100) comment = "🎉 대단합니다! 21종 메인 레시피 마스터 수준입니다!";
+            else if (scorePct >= 80) comment = "👍 훌륭합니다! 실제 매장 주문 대응도 문제없습니다.";
+            document.getElementById('result-comment').innerText = comment;
+        }
+
+        function exitQuiz() {
+            if (confirm('진행 중인 퀴즈를 종료하고 대시보드로 이동하시겠습니까?')) {
+                showView('dashboard');
+            }
+        }
+
+        /* ==========================================================================
+           6. RECIPE GUIDE & INCORRECT NOTES VIEW RENDERERS
+           ========================================================================== */
+        function renderGuideTable() {
+            const tbody = document.getElementById('guide-table-body');
+            const query = (document.getElementById('guide-search').value || '').trim().toLowerCase();
+
+            const filtered = SUBWAY_DATA.filter(item => {
+                return item.name.toLowerCase().includes(query) ||
+                       item.main.toLowerCase().includes(query) ||
+                       item.sauce.toLowerCase().includes(query);
+            });
+
+            tbody.innerHTML = filtered.map(item => `
+                <tr class="hover:bg-slate-50 transition">
+                    <td class="p-3 text-center text-slate-400 font-bold">${item.id}</td>
+                    <td class="p-3 font-extrabold text-slate-900">
+                        ${item.name}
+                        ${item.best ? `<span class="ml-1 bg-amber-100 text-amber-800 text-[10px] font-black px-1.5 py-0.2 rounded border border-amber-200">BEST</span>` : ''}
+                    </td>
+                    <td class="p-3 font-bold text-subway-darkgreen">${item.main}</td>
+                    <td class="p-3 text-slate-600">
+                        <span class="bg-slate-100 px-1.5 py-0.5 rounded font-bold">${item.bread}</span>
+                        <span class="bg-slate-100 px-1.5 py-0.5 rounded font-bold">${item.cheese}</span><br>
+                        <span class="text-xs text-subway-green font-extrabold">${item.sauce}</span>
+                    </td>
+                    <td class="p-3 font-extrabold text-amber-600 bg-amber-50/50">${item.tip}</td>
+                </tr>
+            `).join('');
+        }
+
+        function renderNotesList() {
+            const list = document.getElementById('notes-list');
+            if (state.notes.length === 0) {
+                list.innerHTML = `
+                    <div class="text-center py-12 text-slate-400 font-bold text-xs">
+                        <i class="fa-solid fa-circle-check text-3xl mb-2 text-emerald-400"></i>
+                        <p>보관된 오답이 없습니다. 완벽합니다!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            list.innerHTML = state.notes.map((item, idx) => `
+                <div class="p-4 rounded-xl border border-slate-200 bg-slate-50 flex items-start justify-between gap-3">
+                    <div class="space-y-1">
+                        <div class="text-xs font-black text-rose-500">[오답 #${idx + 1}] ${item.menuTag || ''}</div>
+                        <h3 class="text-sm font-extrabold text-slate-800">${item.question}</h3>
+                        <p class="text-xs font-bold text-subway-darkgreen">정답: ${item.answer}</p>
+                        <p class="text-[11px] font-semibold text-slate-500">${item.cheatTip || ''}</p>
+                    </div>
+                    <button onclick="deleteNote(${idx})" class="text-slate-400 hover:text-rose-500 text-xs font-bold p-1">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function deleteNote(idx) {
+            state.notes.splice(idx, 1);
+            saveNotes();
+            renderNotesList();
+        }
+
+        function clearNotes() {
+            if (confirm('오답 노트를 완전히 비우시겠습니까?')) {
+                state.notes = [];
+                saveNotes();
+                renderNotesList();
+            }
+        }
+
+        /* ==========================================================================
+           7. INIT APP
+           ========================================================================== */
+        window.addEventListener('DOMContentLoaded', () => {
+            updateDashboardStats();
+            showView('dashboard');
+        });
     </script>
 </body>
 </html>
