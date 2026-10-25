@@ -176,11 +176,16 @@
                     <div>
                         <label class="block text-slate-500 mb-1.5">문제 유형</label>
                         <select id="setting-type" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-subway-green">
-                            <option value="all">전체 무작위 혼합 출제</option>
+                            <option value="all">전체 무작위 혼합 출제 (10가지 유형)</option>
                             <option value="mc">객관식 (4지 선다)</option>
-                            <option value="short">주관식 단답 / 빈칸 채우기</option>
+                            <option value="short">주관식 단답</option>
+                            <option value="fill">빈칸 채우기</option>
                             <option value="ox">OX 퀴즈</option>
+                            <option value="rev_mc">재료보고 메뉴 맞히기</option>
+                            <option value="recipe_to_menu">레시피 ➔ 메뉴 맞히기</option>
                             <option value="veggie_order">야채 순서 배열 전용</option>
+                            <option value="wrong_recipe">잘못된 레시피 찾아내기</option>
+                            <option value="quick_response">스피드 퀴즈 (수량 정답)</option>
                             <option value="order_roleplay">실전 고객 주문 상황 퀴즈</option>
                         </select>
                     </div>
@@ -221,6 +226,19 @@
                 <button onclick="exitQuiz()" class="text-slate-400 hover:text-slate-600 text-xs font-bold px-2 py-1">
                     <i class="fa-solid fa-xmark text-sm"></i> 종료
                 </button>
+            </div>
+
+            <!-- Custom Message Modal (Alert replacement) -->
+            <div id="quiz-msg-modal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+                <div class="bg-white rounded-2xl p-6 max-w-sm w-full text-center space-y-4 shadow-xl border border-slate-200">
+                    <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto text-xl">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    </div>
+                    <p id="quiz-msg-text" class="text-sm font-bold text-slate-800 leading-snug">답안을 선택해주세요.</p>
+                    <button onclick="closeMsgModal()" class="w-full bg-subway-green text-white font-extrabold py-2.5 rounded-xl text-xs hover:bg-subway-darkgreen transition">
+                        확인
+                    </button>
+                </div>
             </div>
 
             <!-- Quiz Card -->
@@ -441,7 +459,7 @@
             sessionScore: 0,
             sessionStartTime: null,
 
-            isAnswerSubmitted: false, // Flag for handling next button properly
+            isAnswerSubmitted: false, // Flag for handling submission vs next question
             veggieUserSequence: []
         };
 
@@ -451,6 +469,15 @@
         function saveNotes() {
             localStorage.setItem('subway_notes_v2', JSON.stringify(state.notes));
             updateNotesBadge();
+        }
+
+        function showMsgModal(msg) {
+            document.getElementById('quiz-msg-text').innerText = msg;
+            document.getElementById('quiz-msg-modal').classList.remove('hidden');
+        }
+
+        function closeMsgModal() {
+            document.getElementById('quiz-msg-modal').classList.add('hidden');
         }
 
         /* 3. NAVIGATION CONTROLLER */
@@ -526,7 +553,7 @@
             updateNotesBadge();
         }
 
-        /* 4. QUIZ GENERATION ENGINE */
+        /* 4. QUIZ GENERATION ENGINE (10 QUIZ TYPES) */
         const randItem = (arr) => arr[Math.floor(Math.random() * arr.length)];
         const shuffle = (arr) => [...arr].sort(() => Math.random() - 0.5);
 
@@ -535,8 +562,10 @@
             let questions = [];
 
             const reqCount = state.settingCount === 999 ? 50 : state.settingCount;
-            const range = state.settingRange;
-            const chosenType = state.settingType;
+            const range = document.getElementById('setting-range').value;
+            const chosenType = document.getElementById('setting-type').value;
+
+            const ALL_TYPES = ['mc', 'short', 'fill', 'ox', 'rev_mc', 'recipe_to_menu', 'veggie_order', 'wrong_recipe', 'quick_response', 'order_roleplay'];
 
             for (let i = 0; i < reqCount; i++) {
                 const targetMenu = randItem(pool);
@@ -548,7 +577,7 @@
                     } else if (range === 'subpick') {
                         qType = randItem(['mc', 'short', 'order_roleplay']);
                     } else {
-                        qType = randItem(['mc', 'short', 'fill', 'ox', 'rev_mc', 'order_roleplay', 'veggie_order']);
+                        qType = randItem(ALL_TYPES);
                     }
                 }
 
@@ -591,6 +620,17 @@
                         break;
 
                     case 'fill':
+                        qObj = {
+                            type: 'short',
+                            menuTag: `${targetMenu.name} (빈칸 채우기)`,
+                            question: `"${targetMenu.name}"의 메인 속재료: [ ${targetMenu.main.replace(/[0-9]/g, '?')} ] 중 숫자에 들어갈 올바른 수량/단어를 작성하세요.`,
+                            subtext: `정확한 풀 레시피 수량을 입력하세요 (예: ${targetMenu.main})`,
+                            answer: targetMenu.main,
+                            fullRecipe: targetMenu,
+                            cheatTip: targetMenu.tip
+                        };
+                        break;
+
                     case 'short':
                         qObj = {
                             type: 'short',
@@ -604,14 +644,52 @@
                         break;
 
                     case 'rev_mc':
+                    case 'recipe_to_menu':
                         const wrongMenus = shuffle(SUBWAY_DATA.filter(d => d.id !== targetMenu.id)).slice(0, 3);
-                        const options = shuffle([targetMenu, ...wrongMenus]);
+                        const optionsR = shuffle([targetMenu, ...wrongMenus]);
                         qObj = {
                             type: 'mc',
                             menuTag: '재료보고 메뉴 맞히기',
                             question: `다음 메인 속재료 [ ${targetMenu.main} ] 이(가) 들어가는 샌드위치는?`,
-                            options: options.map(o => o.name),
+                            options: optionsR.map(o => o.name),
                             answer: targetMenu.name,
+                            fullRecipe: targetMenu,
+                            cheatTip: targetMenu.tip
+                        };
+                        break;
+
+                    case 'wrong_recipe':
+                        const otherMenu = randItem(SUBWAY_DATA.filter(d => d.id !== targetMenu.id));
+                        const wrongOptions = shuffle([
+                            `메인: ${targetMenu.main}`,
+                            `빵: ${targetMenu.bread}`,
+                            `치즈: ${otherMenu.cheese}`, // Wrong point
+                            `소스: ${targetMenu.sauce}`
+                        ]);
+                        qObj = {
+                            type: 'mc',
+                            menuTag: `${targetMenu.name} (잘못된 항목 찾기)`,
+                            question: `"${targetMenu.name}"의 썹픽(Sub Pick) 공식 레시피 중 [잘못된 것] 하나를 고르세요.`,
+                            options: wrongOptions,
+                            answer: `치즈: ${otherMenu.cheese}`,
+                            fullRecipe: targetMenu,
+                            cheatTip: `올바른 치즈는 [${targetMenu.cheese}] 입니다.`
+                        };
+                        break;
+
+                    case 'quick_response':
+                        const qOpts = shuffle([
+                            targetMenu.main,
+                            randItem(SUBWAY_DATA.filter(d => d.id !== targetMenu.id)).main,
+                            randItem(SUBWAY_DATA.filter(d => d.id !== targetMenu.id)).main,
+                            randItem(SUBWAY_DATA.filter(d => d.id !== targetMenu.id)).main
+                        ]);
+                        qObj = {
+                            type: 'mc',
+                            menuTag: `스피드 퀴즈 - ${targetMenu.name}`,
+                            question: `[초스피드 암기] "${targetMenu.name}" 정량 스쿱/장수는?`,
+                            options: qOpts,
+                            answer: targetMenu.main,
                             fullRecipe: targetMenu,
                             cheatTip: targetMenu.tip
                         };
@@ -659,14 +737,14 @@
         /* 5. QUIZ RUNNER & NAVIGATION FIX */
         function startQuickQuiz() {
             setCount(10);
-            state.settingRange = 'all';
-            state.settingType = 'all';
+            document.getElementById('setting-range').value = 'all';
+            document.getElementById('setting-type').value = 'all';
             startCustomQuiz();
         }
 
         function startNotesQuiz() {
             if (state.notes.length === 0) {
-                alert('저장된 오답이 없습니다!');
+                showMsgModal('저장된 오답이 없습니다!');
                 return;
             }
             state.quizList = shuffle([...state.notes]);
@@ -695,6 +773,7 @@
             document.getElementById('quiz-progress-text').innerText = `${String(state.currentIndex + 1).padStart(2, '0')} / ${String(total).padStart(2, '0')}`;
             document.getElementById('quiz-progress-bar').style.width = `${((state.currentIndex + 1) / total) * 100}%`;
             document.getElementById('quiz-menu-tag').innerText = q.menuTag || '레시피 퀴즈';
+            document.getElementById('quiz-badge-type').innerText = q.type.toUpperCase();
             document.getElementById('quiz-question-text').innerText = q.question;
             document.getElementById('quiz-subtext').innerText = q.subtext || '정답을 선택하거나 입력하세요.';
 
@@ -717,15 +796,15 @@
                     const btn = document.createElement('button');
                     btn.type = 'button';
                     btn.className = 'quiz-opt-btn w-full text-left p-3.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-emerald-50 hover:border-emerald-300 font-bold text-xs sm:text-sm text-slate-800 transition flex items-center justify-between';
-                    btn.innerHTML = `<span>${opt}</span> <i class="fa-regular fa-circle text-slate-300"></i>`;
+                    btn.innerHTML = `<span class="pointer-events-none">${opt}</span> <i class="fa-regular fa-circle text-slate-300 pointer-events-none"></i>`;
                     btn.onclick = () => {
                         document.querySelectorAll('.quiz-opt-btn').forEach(b => {
                             b.className = 'quiz-opt-btn w-full text-left p-3.5 rounded-xl border border-slate-200 bg-slate-50 font-bold text-xs sm:text-sm text-slate-800 transition flex items-center justify-between';
-                            b.querySelector('i').className = 'fa-regular fa-circle text-slate-300';
+                            b.querySelector('i').className = 'fa-regular fa-circle text-slate-300 pointer-events-none';
                             delete b.dataset.selected;
                         });
                         btn.className = 'quiz-opt-btn w-full text-left p-3.5 rounded-xl border-2 border-subway-green bg-emerald-50 font-extrabold text-xs sm:text-sm text-subway-darkgreen shadow-2xs flex items-center justify-between';
-                        btn.querySelector('i').className = 'fa-solid fa-circle-check text-subway-green';
+                        btn.querySelector('i').className = 'fa-solid fa-circle-check text-subway-green pointer-events-none';
                         btn.dataset.selected = "true";
                     };
                     btn.dataset.val = opt;
@@ -809,23 +888,23 @@
 
             if (q.type === 'mc') {
                 const sel = document.querySelector('.quiz-opt-btn[data-selected="true"]');
-                if (!sel) { alert('답안을 선택해주세요!'); return; }
+                if (!sel) { showMsgModal('답안을 선택해주세요!'); return; }
                 userAns = sel.dataset.val;
                 isCorrect = (userAns === q.answer);
             } else if (q.type === 'ox') {
                 const sel = document.querySelector('.quiz-ox-btn[data-selected="true"]');
-                if (!sel) { alert('O 또는 X를 선택해주세요!'); return; }
+                if (!sel) { showMsgModal('O 또는 X를 선택해주세요!'); return; }
                 userAns = sel.dataset.val;
                 isCorrect = (userAns === q.answer);
             } else if (q.type === 'short') {
                 const input = document.getElementById('input-short-answer');
-                if (!input || !input.value.trim()) { alert('답을 입력해주세요!'); return; }
+                if (!input || !input.value.trim()) { showMsgModal('답을 입력해주세요!'); return; }
                 userAns = input.value.trim();
                 const norm = (str) => str.replace(/[\s\(\)\,\.\+\-]/g, '').toLowerCase();
                 isCorrect = norm(userAns) === norm(q.answer);
             } else if (q.type === 'veggie_order') {
                 if (state.veggieUserSequence.length < 8) {
-                    alert('8가지 야채를 모두 순서대로 선택해주세요!');
+                    showMsgModal('8가지 야채를 모두 순서대로 선택해주세요!');
                     return;
                 }
                 userAns = state.veggieUserSequence.join(' -> ');
@@ -936,9 +1015,7 @@
         }
 
         function exitQuiz() {
-            if (confirm('퀴즈를 종료하고 대시보드로 돌아가시겠습니까?')) {
-                showView('dashboard');
-            }
+            showView('dashboard');
         }
 
         /* 6. GUIDE & NOTES VIEW RENDERERS */
@@ -1004,11 +1081,9 @@
         }
 
         function clearNotes() {
-            if (confirm('오답 노트를 비우시겠습니까?')) {
-                state.notes = [];
-                saveNotes();
-                renderNotesList();
-            }
+            state.notes = [];
+            saveNotes();
+            renderNotesList();
         }
 
         /* 7. INITIALIZATION */
